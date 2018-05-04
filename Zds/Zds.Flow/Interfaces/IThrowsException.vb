@@ -1,5 +1,5 @@
 ﻿Namespace Interfaces
-    Public Interface IExceptionControlable
+    Public Interface IThrowsException
         Property ExceptionHandler As ExceptionHandlers.IExceptionHandler
     End Interface
 End Namespace

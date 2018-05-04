@@ -1,5 +1,6 @@
 ﻿Namespace Collections
     Public Class Round(Of T)
+        Implements Interfaces.IQueue(Of T), Interfaces.IStack(Of T), Interfaces.IStream(Of T), Interfaces.IInput(Of T), Interfaces.IOutput(Of T)
         Private Lock As Object
         Private Round As T()
         Private Start As Integer = 0
@@ -26,7 +27,7 @@
             End Get
         End Property
         'Queue
-        Public Function Enqueue(ByRef Element As T) As Boolean
+        Public Function Enqueue(ByRef Element As T) As Boolean Implements Interfaces.IQueue(Of T).Enqueue, Interfaces.IInput(Of T).Input
             SyncLock Lock
                 If Length = TotalSpace Then Return False
                 Round((Start + Length) Mod TotalSpace) = Element
@@ -34,7 +35,7 @@
                 Return True
             End SyncLock
         End Function
-        Public Function Dequeue(ByRef Element As T) As Boolean
+        Public Function Dequeue(ByRef Element As T) As Boolean Implements Interfaces.IQueue(Of T).Dequeue, Interfaces.IOutput(Of T).Output
             SyncLock Lock
                 If Length = 0 Then Return False
                 Element = Round(Start)
@@ -44,10 +45,10 @@
             End SyncLock
         End Function
         'Stack
-        Public Function Push(ByRef Element As T) As Boolean
+        Public Function Push(ByRef Element As T) As Boolean Implements Interfaces.IStack(Of T).Push
             Return Enqueue(Element)
         End Function
-        Public Function Pop(ByRef Element As T) As Boolean
+        Public Function Pop(ByRef Element As T) As Boolean Implements Interfaces.IStack(Of T).Pop
             SyncLock Lock
                 If Length = 0 Then Return False
                 Element = Round((Start + Length - 1) Mod TotalSpace)
@@ -56,7 +57,7 @@
             End SyncLock
         End Function
         'Stream
-        Public Function Write(Elements As T(), Start As Integer, Length As Integer) As Integer
+        Public Function Write(Elements As T(), Start As Integer, Length As Integer) As Integer Implements Interfaces.IStream(Of T).Write
             SyncLock Lock
                 If Start >= Elements.Length Or Start < 0 Then Return 0
                 If Start + Length > Elements.Length Then Length = Elements.Length - Start
@@ -72,7 +73,7 @@
                 Return Length
             End SyncLock
         End Function
-        Public Function Read(Elements As T(), Start As Integer, Length As Integer) As Integer
+        Public Function Read(Elements As T(), Start As Integer, Length As Integer) As Integer Implements Interfaces.IStream(Of T).Read
             SyncLock Lock
                 If Start >= Elements.Length Or Start < 0 Then Return 0
                 If Start + Length > Elements.Length Then Length = Elements.Length - Start
