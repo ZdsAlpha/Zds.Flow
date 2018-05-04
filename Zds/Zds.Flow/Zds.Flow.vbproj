@@ -59,6 +59,7 @@
     <Compile Include="DelayHandlers\Spin.vb" />
     <Compile Include="ExceptionHandlers\ConsoleLogger.vb" />
     <Compile Include="ExceptionHandlers\ExceptionHandler.vb" />
+    <Compile Include="GlobalSuppressions.vb" />
     <Compile Include="Interfaces\IFunction.vb" />
     <Compile Include="Interfaces\IInput.vb" />
     <Compile Include="Interfaces\IOutput.vb" />
