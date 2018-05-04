@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{0C42BFB1-BBDE-4928-89FA-523433E77E4E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Zds.Flow</RootNamespace>
+    <AssemblyName>Zds.Flow</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <MyType>Windows</MyType>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>Zds.Flow.xml</DocumentationFile>
+    <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>Zds.Flow.xml</DocumentationFile>
+    <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionExplicit>On</OptionExplicit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionCompare>Binary</OptionCompare>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionStrict>Off</OptionStrict>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionInfer>On</OptionInfer>
+  </PropertyGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Collections\Round.vb" />
+    <Compile Include="Collections\SafeList.vb" />
+    <Compile Include="DelayHandlers\ConstantSleep.vb" />
+    <Compile Include="DelayHandlers\Sleep.vb" />
+    <Compile Include="DelayHandlers\Spin.vb" />
+    <Compile Include="ExceptionHandlers\ConsoleLogger.vb" />
+    <Compile Include="ExceptionHandlers\ExceptionHandler.vb" />
+    <Compile Include="Interfaces\IRigidAnimation.vb" />
+    <Compile Include="Interfaces\IAsyncObject.vb" />
+    <Compile Include="Interfaces\IContainer.vb" />
+    <Compile Include="Interfaces\ISystem.vb" />
+    <Compile Include="Interfaces\ICorrectableTimer.vb" />
+    <Compile Include="Interfaces\IDelayHandler.vb" />
+    <Compile Include="Interfaces\IDelayModifiable.vb" />
+    <Compile Include="Interfaces\IDestroyable.vb" />
+    <Compile Include="Interfaces\ExceptionControlable.vb" />
+    <Compile Include="Interfaces\IExceptionHandler.vb" />
+    <Compile Include="Interfaces\IPauseResumable.vb" />
+    <Compile Include="Interfaces\IResetable.vb" />
+    <Compile Include="Interfaces\IStartStopable.vb" />
+    <Compile Include="Interfaces\IRigidStateMachine.vb" />
+    <Compile Include="Interfaces\IStopwatch.vb" />
+    <Compile Include="Interfaces\ISyncObject.vb" />
+    <Compile Include="Interfaces\ITimer.vb" />
+    <Compile Include="Interfaces\IUpdatable.vb" />
+    <Compile Include="Interfaces\IUpdater.vb" />
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="Stopwatch\Stopwatch.vb" />
+    <Compile Include="Stopwatch\SystemStopwatch.vb" />
+    <Compile Include="Updatables\RigidAnimation.vb" />
+    <Compile Include="Updatables\AsyncContainer.vb" />
+    <Compile Include="Updatables\AsyncSystem.vb" />
+    <Compile Include="Updatables\AsyncObject.vb" />
+    <Compile Include="Updatables\AsyncTimer.vb" />
+    <Compile Include="Updatables\RigidStateMachine.vb" />
+    <Compile Include="Updatables\SyncContainer.vb" />
+    <Compile Include="Updatables\SyncSystem.vb" />
+    <Compile Include="Updatables\SyncObject.vb" />
+    <Compile Include="Updatables\SyncTimer.vb" />
+    <Compile Include="Updatables\Updatable.vb" />
+    <Compile Include="Updaters\MultiUpdater.vb" />
+    <Compile Include="Updaters\Threads.vb" />
+    <Compile Include="Updaters\UniUpdater.vb" />
+    <Compile Include="Updaters\Updater.vb" />
+    <Compile Include="Updaters\UpdaterX.vb" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
