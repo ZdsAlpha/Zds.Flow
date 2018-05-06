@@ -42,12 +42,10 @@
                         updater.Add(Me)
                     End If
                 ElseIf Updater IsNot Nothing And _Updater IsNot Nothing Then
-#Disable Warning BC42026 ' Expression recursively calls the containing property 'Public Property Updater As IUpdater'.
+#Disable Warning BC42026 ' Expression recursively calls the containing property
                     Me.Updater = Nothing
-#Enable Warning BC42026 ' Expression recursively calls the containing property 'Public Property Updater As IUpdater'.
-#Disable Warning BC42026 ' Expression recursively calls the containing property 'Public Property Updater As IUpdater'.
                     Me.Updater = Updater
-#Enable Warning BC42026 ' Expression recursively calls the containing property 'Public Property Updater As IUpdater'.
+#Enable Warning BC42026 ' Expression recursively calls the containing property
                 End If
             End Set
         End Property
