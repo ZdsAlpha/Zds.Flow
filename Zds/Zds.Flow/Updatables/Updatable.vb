@@ -3,6 +3,9 @@
     Public Class Updatable
         Implements IUpdatable
         Public Event OnUpdatedEvent(Sender As IUpdatable)
+        Public Event OnDestroyedEvent(Sender As IUpdatable)
+        Public Event OnStartedEvent(Sender As IUpdatable)
+        Public Event OnStoppedEvent(Sender As IUpdatable)
         Private _IsDestroyed As Boolean = False
         Private _IsRunning As Boolean = False
         Private _Updater As Updaters.IUpdater
@@ -61,11 +64,17 @@
         End Property
         Public Overridable Sub Start() Implements Interfaces.IStartStopable.Start
             If IsDestroyed Then Exit Sub
-            _IsRunning = True
+            If Not _IsRunning Then
+                _IsRunning = True
+                RaiseEvent OnStartedEvent(Me)
+            End If
         End Sub
         Public Overridable Sub [Stop]() Implements Interfaces.IStartStopable.Stop
             If IsDestroyed Then Exit Sub
-            _IsRunning = False
+            If _IsRunning Then
+                _IsRunning = False
+                RaiseEvent OnStoppedEvent(Me)
+            End If
         End Sub
         Public Sub Update() Implements IUpdatable.Update
             If IsDestroyed Then Exit Sub
@@ -85,6 +94,7 @@
             [Stop]()
             Updater = Nothing
             _IsDestroyed = True
+            RaiseEvent OnDestroyedEvent(Me)
         End Sub
         Protected Sub Handle(ex As Exception)
             Dim Updater As Updaters.IUpdater = Me.Updater

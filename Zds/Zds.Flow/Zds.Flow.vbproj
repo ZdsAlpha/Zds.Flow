@@ -21,6 +21,7 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DocumentationFile>Zds.Flow.xml</DocumentationFile>
     <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</NoWarn>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -62,10 +63,13 @@
     <Compile Include="Interfaces\IFunction.vb" />
     <Compile Include="Interfaces\IInput.vb" />
     <Compile Include="Interfaces\IOutput.vb" />
+    <Compile Include="Interfaces\IProcessor.vb" />
     <Compile Include="Interfaces\IQueue.vb" />
     <Compile Include="Interfaces\IRigidAnimation.vb" />
     <Compile Include="Interfaces\IAsyncObject.vb" />
     <Compile Include="Interfaces\IContainer.vb" />
+    <Compile Include="Interfaces\ISink.vb" />
+    <Compile Include="Interfaces\ISource.vb" />
     <Compile Include="Interfaces\IStack.vb" />
     <Compile Include="Interfaces\IStream.vb" />
     <Compile Include="Interfaces\ISystem.vb" />
@@ -84,6 +88,7 @@
     <Compile Include="Interfaces\ITimer.vb" />
     <Compile Include="Interfaces\IUpdatable.vb" />
     <Compile Include="Interfaces\IUpdater.vb" />
+    <Compile Include="Machinery\Machinery.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="Stopwatch\Stopwatch.vb" />
     <Compile Include="Stopwatch\SystemStopwatch.vb" />
