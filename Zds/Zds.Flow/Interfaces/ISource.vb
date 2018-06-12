@@ -1,5 +1,5 @@
 ﻿Namespace Machinery
-    Public Interface ISource(Of T)
-        Property Sink As ISink(Of T)
+    Public Interface ISource(Of Output)
+        Property Sink As ISink(Of Output)
     End Interface
 End Namespace
