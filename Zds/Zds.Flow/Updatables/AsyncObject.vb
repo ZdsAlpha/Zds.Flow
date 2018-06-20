@@ -1,12 +1,24 @@
-﻿Namespace Updatables
+﻿Imports System.Threading
+
+Namespace Updatables
     <DebuggerStepThrough>
     Public Class AsyncObject
         Inherits Updatable
         Implements IAsyncObject
         Public Event AsyncUpdateEvent(Sender As AsyncObject)
+        Public ReadOnly Property ActiveThreads As Integer
+        Public Property MaxThreads As Integer = -1
         Protected Overrides Sub OnUpdated()
             MyBase.OnUpdated()
-            AsyncUpdate()
+            If _MaxThreads = -1 OrElse _ActiveThreads < _MaxThreads Then
+                Interlocked.Increment(_ActiveThreads)
+                Try
+                    If _MaxThreads = -1 OrElse _ActiveThreads <= _MaxThreads Then AsyncUpdate()
+                Catch ex As Exception
+                    Handle(ex)
+                End Try
+                Interlocked.Decrement(_ActiveThreads)
+            End If
         End Sub
         Protected Overridable Sub AsyncUpdate() Implements IAsyncObject.AsyncUpdate
             RaiseEvent AsyncUpdateEvent(Me)
