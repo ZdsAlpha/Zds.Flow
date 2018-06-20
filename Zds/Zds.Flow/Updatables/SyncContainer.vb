@@ -30,7 +30,7 @@
         Sub New()
         End Sub
         Sub New(Updater As Updaters.IUpdater)
-            Updater.Add(Me)
+            MyBase.New(Updater)
         End Sub
     End Class
 End Namespace

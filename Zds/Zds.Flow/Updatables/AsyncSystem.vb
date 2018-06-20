@@ -102,7 +102,7 @@ Namespace Updatables
         Sub New()
         End Sub
         Sub New(Updater As IUpdater)
-            Updater.Add(Me)
+            MyBase.New(Updater)
         End Sub
     End Class
 End Namespace

@@ -35,13 +35,13 @@
         Sub New()
         End Sub
         Sub New(Updater As Updaters.IUpdater)
-            Updater.Add(Me)
+            MyBase.New(Updater)
         End Sub
         Sub New(SyncUpdate As SyncUpdateEventEventHandler)
             AddHandler SyncUpdateEvent, SyncUpdate
         End Sub
         Sub New(Updater As Updaters.IUpdater, SyncUpdate As SyncUpdateEventEventHandler)
-            Updater.Add(Me)
+            MyBase.New(Updater)
             AddHandler SyncUpdateEvent, SyncUpdate
         End Sub
     End Class

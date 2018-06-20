@@ -29,7 +29,7 @@
             Me.New(Updater, Nothing)
         End Sub
         Sub New(Updater As Updaters.IUpdater, MachineEvent As MachineEventEventHandler)
-            Me.Updater = Updater
+            MyBase.New(Updater)
             AddHandler MachineEvent, MachineEvent
             Delay = TimeSpan.Zero
             IsTolerant = True

@@ -29,13 +29,13 @@ Namespace Updatables
         Sub New()
         End Sub
         Sub New(Updater As Updaters.IUpdater)
-            Updater.Add(Me)
+            MyBase.New(Updater)
         End Sub
         Sub New(AsyncUpdate As AsyncUpdateEventEventHandler)
             AddHandler AsyncUpdateEvent, AsyncUpdate
         End Sub
         Sub New(Updater As Updaters.IUpdater, AsyncUpdate As AsyncUpdateEventEventHandler)
-            Updater.Add(Me)
+            MyBase.New(Updater)
             AddHandler AsyncUpdateEvent, AsyncUpdate
         End Sub
     End Class

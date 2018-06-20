@@ -103,18 +103,36 @@
             If ex.GetType Is GetType(Threading.ThreadAbortException) Then Threading.Thread.ResetAbort()
         End Sub
         Sub New()
+            If DefaultUpdater IsNot Nothing Then
+                DefaultUpdater.Add(Me)
+                Updater = DefaultUpdater
+            End If
         End Sub
         Sub New(Updater As Updaters.IUpdater)
-            Updater.Add(Me)
-            Me.Updater = Updater
+            If Updater IsNot Nothing Then
+                Updater.Add(Me)
+                Me.Updater = Updater
+            End If
         End Sub
         Sub New(Update As OnUpdatedEventEventHandler)
-            AddHandler Me.OnUpdatedEvent, Update
+            AddHandler OnUpdatedEvent, Update
+            If DefaultUpdater IsNot Nothing Then
+                DefaultUpdater.Add(Me)
+                Updater = DefaultUpdater
+            End If
         End Sub
         Sub New(Updater As Updaters.IUpdater, Update As OnUpdatedEventEventHandler)
+            If Updater IsNot Nothing Then
+                Updater.Add(Me)
+                Me.Updater = Updater
+            End If
             AddHandler Me.OnUpdatedEvent, Update
-            Updater.Add(Me)
-            Me.Updater = Updater
+        End Sub
+
+        Public Shared Property DefaultUpdater As Updaters.IUpdater
+        Shared Sub New()
+            DefaultUpdater = New Updaters.UpdaterX()
+            DefaultUpdater.Start()
         End Sub
     End Class
 End Namespace

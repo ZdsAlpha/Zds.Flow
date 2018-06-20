@@ -72,13 +72,13 @@
         Sub New()
         End Sub
         Sub New(Updater As Updaters.IUpdater)
-            Updater.Add(Me)
+            MyBase.New(Updater)
         End Sub
         Sub New(Tick As TickEventEventHandler)
             AddHandler TickEvent, Tick
         End Sub
         Sub New(Updater As Updaters.IUpdater, Tick As TickEventEventHandler)
-            Updater.Add(Me)
+            MyBase.New(Updater)
             AddHandler TickEvent, Tick
         End Sub
     End Class
