@@ -18,7 +18,7 @@ Namespace Machinery
         End Sub
         Public Delegate Sub SinkDelegate(obj As Input)
         Sub New()
-            Buffer = New Round(Of Input)(4096)
+            Buffer = New Collection(Of Input)(4096)
         End Sub
         Sub New(Buffer As IQueue(Of Input))
             Me.Buffer = Buffer

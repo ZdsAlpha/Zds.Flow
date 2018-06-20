@@ -1,10 +1,10 @@
 ﻿Namespace Collections
-    Public Class Round(Of T)
+    Public Class Collection(Of T)
         Implements IQueue(Of T), IStack(Of T), IStream(Of T), Interfaces.IInput(Of T), Interfaces.IOutput(Of T)
         Private Lock As Object
-        Private Round As T()
-        Private Start As Integer = 0
-        Private Length As Integer = 0
+        Private Buffer As T()
+        Private Position As Integer
+        Private Length As Integer
         Public ReadOnly Property TotalSpace As Integer
         Public ReadOnly Property Elements As T()
             Get
@@ -13,7 +13,7 @@
         End Property
         Public ReadOnly Property Size As Integer
             Get
-                Return Round.Length
+                Return Buffer.Length
             End Get
         End Property
         Public ReadOnly Property FreeSpace As Integer
@@ -26,11 +26,21 @@
                 Return Length
             End Get
         End Property
+        Public Property Element(Index As Integer) As T
+            Get
+                If Index >= Length Then Throw New IndexOutOfRangeException()
+                Return Buffer((Position + Index) Mod TotalSpace)
+            End Get
+            Set(value As T)
+                If Index >= Length Then Throw New IndexOutOfRangeException()
+                Buffer((Position + Index) Mod TotalSpace) = value
+            End Set
+        End Property
         'Queue
         Public Function Enqueue(ByRef Element As T) As Boolean Implements IQueue(Of T).Enqueue, Interfaces.IInput(Of T).Input
             SyncLock Lock
                 If Length = TotalSpace Then Return False
-                Round((Start + Length) Mod TotalSpace) = Element
+                Buffer((Position + Length) Mod TotalSpace) = Element
                 Length += 1
                 Return True
             End SyncLock
@@ -38,8 +48,8 @@
         Public Function Dequeue(ByRef Element As T) As Boolean Implements IQueue(Of T).Dequeue, Interfaces.IOutput(Of T).Output
             SyncLock Lock
                 If Length = 0 Then Return False
-                Element = Round(Start)
-                Start = (Start + 1) Mod TotalSpace
+                Element = Buffer(Position)
+                Position = (Position + 1) Mod TotalSpace
                 Length = Length - 1
                 Return True
             End SyncLock
@@ -51,7 +61,7 @@
         Public Function Pop(ByRef Element As T) As Boolean Implements IStack(Of T).Pop
             SyncLock Lock
                 If Length = 0 Then Return False
-                Element = Round((Start + Length - 1) Mod TotalSpace)
+                Element = Buffer((Position + Length - 1) Mod TotalSpace)
                 Length = Length - 1
                 Return True
             End SyncLock
@@ -63,11 +73,11 @@
                 If Start + Length > Elements.Length Then Length = Elements.Length - Start
                 If Length > FreeSpace Then Length = FreeSpace
                 If Length <= 0 Then Return 0
-                If (Me.Start + Me.Length) Mod TotalSpace + Length > Size Then
-                    Array.Copy(Elements, Start, Round, (Me.Start + Me.Length) Mod TotalSpace, TotalSpace - (Me.Start + Me.Length) Mod TotalSpace)
-                    Array.Copy(Elements, Start + TotalSpace - (Me.Start + Me.Length) Mod TotalSpace, Round, 0, Length - TotalSpace + (Me.Start + Me.Length) Mod TotalSpace)
+                If (Me.Position + Me.Length) Mod TotalSpace + Length > Size Then
+                    Array.Copy(Elements, Start, Buffer, (Me.Position + Me.Length) Mod TotalSpace, TotalSpace - (Me.Position + Me.Length) Mod TotalSpace)
+                    Array.Copy(Elements, Start + TotalSpace - (Me.Position + Me.Length) Mod TotalSpace, Buffer, 0, Length - TotalSpace + (Me.Position + Me.Length) Mod TotalSpace)
                 Else
-                    Array.Copy(Elements, Start, Round, (Me.Start + Me.Length) Mod TotalSpace, Length)
+                    Array.Copy(Elements, Start, Buffer, (Me.Position + Me.Length) Mod TotalSpace, Length)
                 End If
                 Me.Length += Length
                 Return Length
@@ -79,13 +89,13 @@
                 If Start + Length > Elements.Length Then Length = Elements.Length - Start
                 If Length > Count Then Length = Count
                 If Length <= 0 Then Return 0
-                If Me.Start + Length > Size Then
-                    Array.Copy(Round, Me.Start, Elements, Start, TotalSpace - Me.Start)
-                    Array.Copy(Round, 0, Elements, Start + TotalSpace - Me.Start, Length - TotalSpace - Me.Start)
+                If Me.Position + Length > Size Then
+                    Array.Copy(Buffer, Me.Position, Elements, Start, TotalSpace - Me.Position)
+                    Array.Copy(Buffer, 0, Elements, Start + TotalSpace - Me.Position, Length - TotalSpace - Me.Position)
                 Else
-                    Array.Copy(Round, Me.Start, Elements, Start, Length)
+                    Array.Copy(Buffer, Me.Position, Elements, Start, Length)
                 End If
-                Me.Start = (Me.Start + Length) Mod TotalSpace
+                Me.Position = (Me.Position + Length) Mod TotalSpace
                 Me.Length -= Length
                 Return Length
             End SyncLock
@@ -99,81 +109,81 @@
         End Function
 
         Public Sub Defrag()
-            If Start = 0 Then Exit Sub
+            If Position = 0 Then Exit Sub
             SyncLock Lock
-                Dim Temp(Round.Length - 1) As T
-                If Start + Length >= Round.Length Then
-                    Array.Copy(Round, Start, Temp, 0, Round.Length - Start)
-                    Array.Copy(Round, 0, Temp, Round.Length - Start, Length - Round.Length + Start)
+                Dim Temp(Buffer.Length - 1) As T
+                If Position + Length >= Buffer.Length Then
+                    Array.Copy(Buffer, Position, Temp, 0, Buffer.Length - Position)
+                    Array.Copy(Buffer, 0, Temp, Buffer.Length - Position, Length - Buffer.Length + Position)
                 Else
-                    Array.Copy(Round, Start, Temp, 0, Length)
+                    Array.Copy(Buffer, Position, Temp, 0, Length)
                 End If
-                Array.Copy(Temp, 0, Round, 0, Length)
-                Start = 0
+                Array.Copy(Temp, 0, Buffer, 0, Length)
+                Position = 0
             End SyncLock
         End Sub
         Public Sub Clean()
             SyncLock Lock
                 For i = 0 To FreeSpace - 1
-                    Round((Start + Length + i) Mod TotalSpace) = Nothing
+                    Buffer((Position + Length + i) Mod TotalSpace) = Nothing
                 Next
             End SyncLock
         End Sub
         Public Sub Clear()
             SyncLock Lock
-                For i = Start To Length - 1
-                    Round(i Mod TotalSpace) = Nothing
+                For i = Position To Length - 1
+                    Buffer(i Mod TotalSpace) = Nothing
                 Next
-                Start = 0
+                Position = 0
                 Length = 0
             End SyncLock
         End Sub
         Public Function ToArray() As T()
-            Dim Round As T() = Me.Round
+            Dim Round As T() = Me.Buffer
             Dim Array(Length - 1) As T
-            If Start + Length >= TotalSpace Then
-                System.Array.Copy(Round, Start, Array, 0, TotalSpace - Start)
-                System.Array.Copy(Round, 0, Array, TotalSpace - Start, Length - (TotalSpace - Start))
+            If Position + Length >= TotalSpace Then
+                System.Array.Copy(Round, Position, Array, 0, TotalSpace - Position)
+                System.Array.Copy(Round, 0, Array, TotalSpace - Position, Length - (TotalSpace - Position))
             Else
-                System.Array.Copy(Round, Start, Array, 0, Length)
+                System.Array.Copy(Round, Position, Array, 0, Length)
             End If
             Return Array
         End Function
         Sub New(Space As Integer)
             Lock = New Object
-            Round = New T(Space - 1) {}
+            Buffer = New T(Space - 1) {}
             TotalSpace = Space
         End Sub
-        Public Shared Function Copy(Source As IO.Stream, Destination As Round(Of Byte), Length As Integer) As Integer
+        Public Shared Function Copy(Source As IO.Stream, Destination As Collection(Of Byte), Length As Integer) As Integer
             SyncLock Destination.Lock
                 If Not Source.CanRead Then Return 0
                 If Length > Destination.FreeSpace Then Length = Destination.FreeSpace
                 If Length <= 0 Then Return 0
                 Dim Read As Integer = 0
-                If (Destination.Start + Destination.Length) Mod Destination.TotalSpace + Length > Destination.Size Then
-                    Read = Source.Read(Destination.Round, (Destination.Start + Destination.Length) Mod Destination.TotalSpace, Destination.TotalSpace - (Destination.Start + Destination.Length) Mod Destination.TotalSpace)
-                    If Read = Destination.TotalSpace - (Destination.Start + Destination.Length) Mod Destination.TotalSpace Then
-                        Read += Source.Read(Destination.Round, 0, Length - Destination.TotalSpace + (Destination.Start + Destination.Length) Mod Destination.TotalSpace)
+                If (Destination.Position + Destination.Length) Mod Destination.TotalSpace + Length > Destination.Size Then
+                    Read = Source.Read(Destination.Buffer, (Destination.Position + Destination.Length) Mod Destination.TotalSpace, Destination.TotalSpace - (Destination.Position + Destination.Length) Mod Destination.TotalSpace)
+                    If Read = Destination.TotalSpace - (Destination.Position + Destination.Length) Mod Destination.TotalSpace Then
+                        Read += Source.Read(Destination.Buffer, 0, Length - Destination.TotalSpace + (Destination.Position + Destination.Length) Mod Destination.TotalSpace)
                     End If
                 Else
-                    Read = Source.Read(Destination.Round, (Destination.Start + Destination.Length) Mod Destination.TotalSpace, Length)
+                    Read = Source.Read(Destination.Buffer, (Destination.Position + Destination.Length) Mod Destination.TotalSpace, Length)
                 End If
                 Destination.Length += Read
                 Return Read
             End SyncLock
         End Function
-        Public Shared Function Copy(Source As Round(Of Byte), Destination As IO.Stream, Length As Integer) As Integer
+        Public Shared Function Copy(Source As Collection(Of Byte), Destination As IO.Stream, Length As Integer) As Integer
             SyncLock Source.Lock
                 If Not Destination.CanWrite Then Return 0
                 If Length > Source.Count Then Length = Source.Count
                 If Length <= 0 Then Return 0
-                If Source.Start + Length > Source.Size Then
-                    Destination.Write(Source.Round, Source.Start, Source.TotalSpace - Source.Start)
-                    Destination.Write(Source.Round, 0, Length - Source.TotalSpace + Source.Start)
+                If Source.Position + Length > Source.Size Then
+                    Destination.Write(Source.Buffer, Source.Position, Source.TotalSpace - Source.Position)
+                    Destination.Write(Source.Buffer, 0, Length - Source.TotalSpace + Source.Position)
                 Else
-                    Destination.Write(Source.Round, Source.Start, Length)
+                    Destination.Write(Source.Buffer, Source.Position, Length)
                 End If
-                Source.Start = (Source.Start + Length) Mod Source.TotalSpace
+                Source.Position = (Source.Position + Length) Mod Source.TotalSpace
                 Source.Length -= Length
                 Return Length
             End SyncLock
