@@ -6,6 +6,7 @@ Namespace Machinery
         Implements ISink(Of Input)
         Private _Sink As Internals.SyncSink(Of Input)
         Public Property SinkDelegate As Internals.SyncSink(Of Input).SinkDelegate
+        Public Property Buffer As Collections.IQueue(Of Input)
         Public Property Recursive As Boolean Implements ISink(Of Input).Recursive
             Get
                 Return _Sink.Recursive

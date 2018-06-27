@@ -49,6 +49,7 @@
             SyncLock Lock
                 If Length = 0 Then Return False
                 Element = Buffer(Position)
+                Buffer(Position) = Nothing
                 Position = (Position + 1) Mod TotalSpace
                 Length = Length - 1
                 Return True
@@ -61,7 +62,9 @@
         Public Function Pop(ByRef Element As T) As Boolean Implements IStack(Of T).Pop
             SyncLock Lock
                 If Length = 0 Then Return False
-                Element = Buffer((Position + Length - 1) Mod TotalSpace)
+                Dim Index As Integer = (Position + Length - 1) Mod TotalSpace
+                Element = Buffer(Index)
+                Buffer(Index) = Nothing
                 Length = Length - 1
                 Return True
             End SyncLock
@@ -91,9 +94,12 @@
                 If Length <= 0 Then Return 0
                 If Me.Position + Length > Size Then
                     Array.Copy(Buffer, Me.Position, Elements, Start, TotalSpace - Me.Position)
+                    Array.Clear(Buffer, Me.Position, TotalSpace - Me.Position)
                     Array.Copy(Buffer, 0, Elements, Start + TotalSpace - Me.Position, Length - TotalSpace - Me.Position)
+                    Array.Clear(Buffer, 0, Length - TotalSpace - Me.Position)
                 Else
                     Array.Copy(Buffer, Me.Position, Elements, Start, Length)
+                    Array.Clear(Buffer, Me.Position, Length)
                 End If
                 Me.Position = (Me.Position + Length) Mod TotalSpace
                 Me.Length -= Length
