@@ -76,7 +76,7 @@
                 RaiseEvent OnStoppedEvent(Me)
             End If
         End Sub
-        Public Sub Update() Implements IUpdatable.Update
+        Public Sub Update() Implements IUpdatable.Update, Interfaces.IActivatable.Activate
             If IsDestroyed Then Exit Sub
             If IsRunning Then
                 Try

@@ -60,10 +60,11 @@
     <Compile Include="DelayHandlers\Spin.vb" />
     <Compile Include="ExceptionHandlers\ConsoleLogger.vb" />
     <Compile Include="ExceptionHandlers\ExceptionHandler.vb" />
+    <Compile Include="Interfaces\IActivatable.vb" />
     <Compile Include="Interfaces\IFunction.vb" />
     <Compile Include="Interfaces\IInput.vb" />
     <Compile Include="Interfaces\IOutput.vb" />
-    <Compile Include="Interfaces\IProcessor.vb" />
+    <Compile Include="Interfaces\IConverter.vb" />
     <Compile Include="Interfaces\IQueue.vb" />
     <Compile Include="Interfaces\IRigidAnimation.vb" />
     <Compile Include="Interfaces\IAsyncObject.vb" />
@@ -88,10 +89,10 @@
     <Compile Include="Interfaces\ITimer.vb" />
     <Compile Include="Interfaces\IUpdatable.vb" />
     <Compile Include="Interfaces\IUpdater.vb" />
-    <Compile Include="Machinery\Processor.vb" />
+    <Compile Include="Machinery\Internals\SyncConverter.vb" />
     <Compile Include="Machinery\Machinery.vb" />
-    <Compile Include="Machinery\Sink.vb" />
-    <Compile Include="Machinery\Source.vb" />
+    <Compile Include="Machinery\Internals\SyncSink.vb" />
+    <Compile Include="Machinery\Internals\SyncSource.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="Stopwatch\Stopwatch.vb" />
     <Compile Include="Stopwatch\SystemStopwatch.vb" />
