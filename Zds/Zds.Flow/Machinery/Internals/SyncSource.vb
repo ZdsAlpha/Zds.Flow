@@ -1,12 +1,12 @@
 ﻿Namespace Machinery.Internals
-    Public Class SyncSource(Of Input)
-        Implements ISource(Of Input)
-        Public Property Sink As ISink(Of Input) Implements ISource(Of Input).Sink
+    Public Class SyncSource(Of Output)
+        Implements ISource(Of Output)
+        Public Property Sink As ISink(Of Output) Implements ISource(Of Output).Sink
         Public Property Generate As GenerateDelegate
-        Public Property Dropping As Boolean Implements ISource(Of Input).Dropping
+        Public Property Dropping As Boolean = True Implements ISource(Of Output).Dropping
         Private HasValue As Boolean
-        Private Value As Input
-        Public Sub Activate()
+        Private Value As Output
+        Public Sub Activate() Implements ISource(Of Output).Activate
             Dim _Sink = Sink
             If Not HasValue Then HasValue = Generate(Value)
             If HasValue Then
@@ -28,6 +28,6 @@
             Me.Generate = Generate
         End Sub
 
-        Public Delegate Function GenerateDelegate(ByRef obj As Input) As Boolean
+        Public Delegate Function GenerateDelegate(ByRef obj As Output) As Boolean
     End Class
 End Namespace

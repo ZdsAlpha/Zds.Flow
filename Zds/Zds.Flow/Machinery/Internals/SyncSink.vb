@@ -5,14 +5,14 @@ Namespace Machinery.Internals
         Implements ISink(Of Input)
         Public Property Sink As SinkDelegate
         Public Property Buffer As IQueue(Of Input)
-        Public Property Recursive As Boolean Implements ISink(Of Input).Recursive
+        Public Property Recursive As Boolean = True Implements ISink(Of Input).Recursive
         Private HasValue As Boolean
         Private Value As Input
         Public Function Receive(obj As Input) As Boolean Implements ISink(Of Input).Receive
             If Buffer Is Nothing Then Return Nothing
             Return Buffer.Enqueue(obj)
         End Function
-        Public Sub Activate()
+        Public Sub Activate() Implements ISink(Of Input).Activate
             Dim _Buffer = Buffer
             If _Buffer IsNot Nothing AndAlso Not HasValue Then HasValue = _Buffer.Dequeue(Value)
             Do

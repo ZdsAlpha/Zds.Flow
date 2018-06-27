@@ -6,8 +6,8 @@ Namespace Machinery.Internals
         Public Property Sink As ISink(Of Output) Implements ISource(Of Output).Sink
         Public Property Convert As ConvertDelegate
         Public Property Buffer As IQueue(Of Input)
-        Public Property Dropping As Boolean Implements ISource(Of Output).Dropping
-        Public Property Recursive As Boolean Implements ISink(Of Input).Recursive
+        Public Property Dropping As Boolean = True Implements ISource(Of Output).Dropping
+        Public Property Recursive As Boolean = True Implements ISink(Of Input).Recursive
         Private HasValue As Boolean
         Private Value As Input
         Private HasConverted As Boolean
@@ -16,7 +16,7 @@ Namespace Machinery.Internals
             If Buffer Is Nothing Then Return Nothing
             Return Buffer.Enqueue(obj)
         End Function
-        Public Sub Activate()
+        Public Sub Activate() Implements IConverter(Of Input, Output).Activate
             Dim _Sink = Sink
             Dim _Buffer = Buffer
             If _Buffer IsNot Nothing AndAlso Not HasValue Then HasValue = _Buffer.Dequeue(Value)

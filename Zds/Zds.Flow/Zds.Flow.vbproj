@@ -93,6 +93,9 @@
     <Compile Include="Machinery\Machinery.vb" />
     <Compile Include="Machinery\Internals\SyncSink.vb" />
     <Compile Include="Machinery\Internals\SyncSource.vb" />
+    <Compile Include="Machinery\SyncConverter.vb" />
+    <Compile Include="Machinery\SyncSink.vb" />
+    <Compile Include="Machinery\SyncSource.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="Stopwatch\Stopwatch.vb" />
     <Compile Include="Stopwatch\SystemStopwatch.vb" />
