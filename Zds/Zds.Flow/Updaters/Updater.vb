@@ -111,9 +111,24 @@ Namespace Updaters
                 Obj.Destroy()
             Next
             _IsDestroyed = True
+            Deregister(Me)
         End Sub
         Sub New()
+            Register(Me)
             DelayHandler = DelayHandlers.ConstantSleep.UniversalDelayHandler
+        End Sub
+
+        Private Shared _Updaters As New SafeList(Of IUpdater)
+        Public Shared ReadOnly Property Updaters As IUpdater()
+            Get
+                Return _Updaters.Elements
+            End Get
+        End Property
+        Public Shared Sub Register(Updater As IUpdater)
+            If Not _Updaters.Contains(Updater) Then _Updaters.Add(Updater)
+        End Sub
+        Public Shared Sub Deregister(Updater As IUpdater)
+            _Updaters.Remove(Updater)
         End Sub
     End Class
 End Namespace

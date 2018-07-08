@@ -2,7 +2,8 @@
     <DebuggerStepThrough>
     Public Class Updatable
         Implements IUpdatable
-        Public Event OnUpdatedEvent(Sender As IUpdatable)
+        Public Event PreUpdateEvent(Sender As IUpdatable)
+        Public Event PostUpdateEvent(Sender As IUpdatable)
         Public Event OnDestroyedEvent(Sender As IUpdatable)
         Public Event OnStartedEvent(Sender As IUpdatable)
         Public Event OnStoppedEvent(Sender As IUpdatable)
@@ -80,14 +81,16 @@
             If IsDestroyed Then Exit Sub
             If IsRunning Then
                 Try
+                    RaiseEvent PreUpdateEvent(Me)
                     OnUpdated()
                 Catch ex As Exception
                     Handle(ex)
+                Finally
+                    RaiseEvent PostUpdateEvent(Me)
                 End Try
             End If
         End Sub
         Protected Overridable Sub OnUpdated()
-            RaiseEvent OnUpdatedEvent(Me)
         End Sub
         Public Overridable Sub Destroy() Implements Interfaces.IDestroyable.Destroy
             If IsDestroyed Then Exit Sub
@@ -114,19 +117,19 @@
                 Me.Updater = Updater
             End If
         End Sub
-        Sub New(Update As OnUpdatedEventEventHandler)
-            AddHandler OnUpdatedEvent, Update
+        Sub New(Update As PreUpdateEventEventHandler)
+            AddHandler PreUpdateEvent, Update
             If DefaultUpdater IsNot Nothing Then
                 DefaultUpdater.Add(Me)
                 Updater = DefaultUpdater
             End If
         End Sub
-        Sub New(Updater As Updaters.IUpdater, Update As OnUpdatedEventEventHandler)
+        Sub New(Updater As Updaters.IUpdater, Update As PreUpdateEventEventHandler)
             If Updater IsNot Nothing Then
                 Updater.Add(Me)
                 Me.Updater = Updater
             End If
-            AddHandler Me.OnUpdatedEvent, Update
+            AddHandler PreUpdateEvent, Update
         End Sub
 
         Public Shared Property DefaultUpdater As Updaters.IUpdater

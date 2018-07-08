@@ -8,6 +8,7 @@ Namespace Machinery.Internals
         Public Property Buffer As IQueue(Of Input)
         Public Property Dropping As Boolean = True Implements ISource(Of Output).Dropping
         Public Property Recursive As Boolean = True Implements ISink(Of Input).Recursive
+        Public Property MustConvert As Boolean = False Implements IConverter(Of Input, Output).MustConvert
         Private HasValue As Boolean
         Private Value As Input
         Private HasConverted As Boolean
@@ -21,6 +22,7 @@ Namespace Machinery.Internals
             Dim _Buffer = Buffer
             If _Buffer IsNot Nothing AndAlso Not HasValue Then HasValue = _Buffer.Dequeue(Value)
             Do
+                'Sinking converted value
                 If HasConverted Then
                     If Dropping Then
                         If _Sink IsNot Nothing Then _Sink.Receive(Converted)
@@ -33,10 +35,18 @@ Namespace Machinery.Internals
                         End If
                     End If
                 End If
-                If HasValue AndAlso Convert(Value, Converted) Then
-                    HasConverted = True
-                    HasValue = False
-                    Value = Nothing
+                'Converting input value
+                If HasValue And Not HasConverted Then
+                    If Convert(Value, Converted) Then
+                        HasConverted = True
+                        HasValue = False
+                        Value = Nothing
+                    ElseIf Not MustConvert Then
+                        HasValue = False
+                        Value = Nothing
+                    Else
+                        Exit Do
+                    End If
                 Else
                     Exit Do
                 End If

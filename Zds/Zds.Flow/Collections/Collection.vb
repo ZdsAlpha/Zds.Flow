@@ -137,9 +137,7 @@
         End Sub
         Public Sub Clear()
             SyncLock Lock
-                For i = Position To Length - 1
-                    Buffer(i Mod TotalSpace) = Nothing
-                Next
+                Array.Clear(Buffer, 0, Buffer.Length)
                 Position = 0
                 Length = 0
             End SyncLock

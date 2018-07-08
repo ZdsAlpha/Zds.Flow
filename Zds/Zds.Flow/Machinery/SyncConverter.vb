@@ -38,6 +38,14 @@ Namespace Machinery
                 _Converter.Recursive = value
             End Set
         End Property
+        Public Property MustConvert As Boolean Implements IConverter(Of Input, Output).MustConvert
+            Get
+                Return _Converter.MustConvert
+            End Get
+            Set(value As Boolean)
+                _Converter.MustConvert = value
+            End Set
+        End Property
         Public Function Receive(obj As Input) As Boolean Implements ISink(Of Input).Receive
             Return _Converter.Receive(obj)
         End Function

@@ -38,6 +38,9 @@
                 UpdateCache()
             End SyncLock
         End Sub
+        Public Function Contains(Obj As T) As Boolean
+            Return Elements.Contains(Obj)
+        End Function
         Public Sub UpdateCache()
             SyncLock List
                 _Elements = List.ToArray
