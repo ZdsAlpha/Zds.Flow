@@ -1,6 +1,6 @@
 ﻿Imports Zds.Flow.Collections
 
-Namespace Machinery.Internals
+Namespace Machinery.Core
     Public Class SyncConverter(Of Input, Output)
         Implements IConverter(Of Input, Output)
         Public Property Sink As ISink(Of Output) Implements ISource(Of Output).Sink

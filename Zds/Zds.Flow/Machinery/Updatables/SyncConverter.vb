@@ -1,11 +1,11 @@
 ﻿Imports Zds.Flow.Updatables
 
-Namespace Machinery
+Namespace Machinery.Updatables
     Public Class SyncConverter(Of Input, Output)
         Inherits SyncObject
         Implements IConverter(Of Input, Output)
-        Private _Converter As Internals.SyncConverter(Of Input, Output)
-        Public Property ConvertDelegate As Internals.SyncConverter(Of Input, Output).ConvertDelegate
+        Private _Converter As Core.SyncConverter(Of Input, Output)
+        Public Property ConvertDelegate As Core.SyncConverter(Of Input, Output).ConvertDelegate
         Public Property Sink As ISink(Of Output) Implements ISource(Of Output).Sink
             Get
                 Return _Converter.Sink
@@ -65,19 +65,19 @@ Namespace Machinery
             If ConvertDelegate IsNot Nothing Then Return ConvertDelegate(Input, Output) Else Return False
         End Function
         Sub New()
-            _Converter = New Internals.SyncConverter(Of Input, Output)
+            _Converter = New Core.SyncConverter(Of Input, Output)
             _Converter.Convert = AddressOf InternalConvert
         End Sub
-        Sub New(Convert As Internals.SyncConverter(Of Input, Output).ConvertDelegate)
+        Sub New(Convert As Core.SyncConverter(Of Input, Output).ConvertDelegate)
             Me.New()
             ConvertDelegate = Convert
         End Sub
         Sub New(Updater As Updaters.IUpdater)
             MyBase.New(Updater)
-            _Converter = New Internals.SyncConverter(Of Input, Output)
+            _Converter = New Core.SyncConverter(Of Input, Output)
             _Converter.Convert = AddressOf InternalConvert
         End Sub
-        Sub New(Updater As Updaters.IUpdater, Convert As Internals.SyncConverter(Of Input, Output).ConvertDelegate)
+        Sub New(Updater As Updaters.IUpdater, Convert As Core.SyncConverter(Of Input, Output).ConvertDelegate)
             Me.New(Updater)
             ConvertDelegate = Convert
         End Sub

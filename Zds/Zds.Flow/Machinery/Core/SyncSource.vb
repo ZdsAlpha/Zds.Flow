@@ -1,4 +1,4 @@
-﻿Namespace Machinery.Internals
+﻿Namespace Machinery.Core
     Public Class SyncSource(Of Output)
         Implements ISource(Of Output)
         Public Property Sink As ISink(Of Output) Implements ISource(Of Output).Sink

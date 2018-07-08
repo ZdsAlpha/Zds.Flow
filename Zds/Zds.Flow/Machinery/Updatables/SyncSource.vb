@@ -1,11 +1,11 @@
 ﻿Imports Zds.Flow.Updatables
 
-Namespace Machinery
+Namespace Machinery.Updatables
     Public Class SyncSource(Of Output)
         Inherits SyncObject
         Implements ISource(Of Output)
-        Private _Source As Internals.SyncSource(Of Output)
-        Public Property GenerateDelegate As Internals.SyncSource(Of Output).GenerateDelegate
+        Private _Source As Core.SyncSource(Of Output)
+        Public Property GenerateDelegate As Core.SyncSource(Of Output).GenerateDelegate
         Public Property Sink As ISink(Of Output) Implements ISource(Of Output).Sink
             Get
                 Return _Source.Sink
@@ -38,19 +38,19 @@ Namespace Machinery
             If GenerateDelegate IsNot Nothing Then Return GenerateDelegate(Output) Else Return False
         End Function
         Sub New()
-            _Source = New Internals.SyncSource(Of Output)
+            _Source = New Core.SyncSource(Of Output)
             _Source.Generate = AddressOf InternalGenerate
         End Sub
-        Sub New(Generate As Internals.SyncSource(Of Output).GenerateDelegate)
+        Sub New(Generate As Core.SyncSource(Of Output).GenerateDelegate)
             Me.New()
             GenerateDelegate = Generate
         End Sub
         Sub New(Updater As Updaters.IUpdater)
             MyBase.New(Updater)
-            _Source = New Internals.SyncSource(Of Output)
+            _Source = New Core.SyncSource(Of Output)
             _Source.Generate = AddressOf InternalGenerate
         End Sub
-        Sub New(Updater As Updaters.IUpdater, Generate As Internals.SyncSource(Of Output).GenerateDelegate)
+        Sub New(Updater As Updaters.IUpdater, Generate As Core.SyncSource(Of Output).GenerateDelegate)
             Me.New(Updater)
             GenerateDelegate = Generate
         End Sub

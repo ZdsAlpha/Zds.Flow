@@ -1,6 +1,6 @@
 ﻿Imports Zds.Flow.Collections
 
-Namespace Machinery.Internals
+Namespace Machinery.Core
     Public Class SyncSink(Of Input)
         Implements ISink(Of Input)
         Public Property Sink As SinkDelegate

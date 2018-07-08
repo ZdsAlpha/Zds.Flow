@@ -1,11 +1,11 @@
 ﻿Imports Zds.Flow.Updatables
 
-Namespace Machinery
+Namespace Machinery.Updatables
     Public Class SyncSink(Of Input)
         Inherits SyncObject
         Implements ISink(Of Input)
-        Private _Sink As Internals.SyncSink(Of Input)
-        Public Property SinkDelegate As Internals.SyncSink(Of Input).SinkDelegate
+        Private _Sink As Core.SyncSink(Of Input)
+        Public Property SinkDelegate As Core.SyncSink(Of Input).SinkDelegate
         Public Property Buffer As Collections.IQueue(Of Input)
         Public Property Recursive As Boolean Implements ISink(Of Input).Recursive
             Get
@@ -34,19 +34,19 @@ Namespace Machinery
             If SinkDelegate IsNot Nothing Then Return SinkDelegate(Input) Else Return False
         End Function
         Sub New()
-            _Sink = New Internals.SyncSink(Of Input)
+            _Sink = New Core.SyncSink(Of Input)
             _Sink.Sink = AddressOf InternalSink
         End Sub
-        Sub New(Sink As Internals.SyncSink(Of Input).SinkDelegate)
+        Sub New(Sink As Core.SyncSink(Of Input).SinkDelegate)
             Me.New()
             SinkDelegate = Sink
         End Sub
         Sub New(Updater As Updaters.Updater)
             MyBase.New(Updater)
-            _Sink = New Internals.SyncSink(Of Input)
+            _Sink = New Core.SyncSink(Of Input)
             _Sink.Sink = AddressOf InternalSink
         End Sub
-        Sub New(Updater As Updaters.Updater, Sink As Internals.SyncSink(Of Input).SinkDelegate)
+        Sub New(Updater As Updaters.Updater, Sink As Core.SyncSink(Of Input).SinkDelegate)
             MyBase.New(Updater)
             SinkDelegate = Sink
         End Sub
