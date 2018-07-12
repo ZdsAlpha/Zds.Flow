@@ -29,9 +29,6 @@
         Protected Overridable Sub SyncUpdate() Implements ISyncObject.SyncUpdate
             RaiseEvent SyncUpdateEvent(Me)
         End Sub
-        Public Overrides Sub Destroy()
-            MyBase.Destroy()
-        End Sub
         Sub New()
         End Sub
         Sub New(Updater As Updaters.IUpdater)

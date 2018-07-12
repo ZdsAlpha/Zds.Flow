@@ -5,15 +5,18 @@ Imports Zds.Flow.Machinery.Updatables
 Imports Zds.Flow.Updatables
 Public Module Main
     Dim frames As Integer = 0
-    <DebuggerStepThrough>
     Public Sub Main()
+        MsgBox((New Byte(10) {}).Length)
         Dim Timer As New SyncTimer(AddressOf FPSUpdater)
         Timer.Start()
         Dim sc As New ScreenCapture
         IO.Directory.CreateDirectory(sc.Directory)
-        Updatable.DefaultUpdater.ExceptionHandler = New ExceptionHandlers.ConsoleLogger
+        Dim consoleLogger As ExceptionHandlers.ConsoleLogger = New ExceptionHandlers.ConsoleLogger
+        Updatable.DefaultUpdater.ExceptionHandler = consoleLogger
+        sc.ExceptionHandler = consoleLogger
         AddHandler sc.OnFinishedFrame, Sub() frames += 1
         sc.Start()
+
     End Sub
     Public Sub FPSUpdater()
         Console.Title = frames.ToString + " fps"

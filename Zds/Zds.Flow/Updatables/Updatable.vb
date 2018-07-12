@@ -99,7 +99,7 @@
             _IsDestroyed = True
             RaiseEvent OnDestroyedEvent(Me)
         End Sub
-        Protected Sub Handle(ex As Exception)
+        Protected Overridable Sub Handle(ex As Exception)
             Dim Updater As Updaters.IUpdater = Me.Updater
             If ExceptionHandler IsNot Nothing Then ExceptionHandler.Catch(Me, ex)
             If Updater IsNot Nothing AndAlso Updater.ExceptionHandler IsNot Nothing Then Updater.ExceptionHandler.Catch(Me, ex)

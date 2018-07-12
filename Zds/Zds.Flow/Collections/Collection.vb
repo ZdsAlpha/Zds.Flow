@@ -192,5 +192,56 @@
                 Return Length
             End SyncLock
         End Function
+
+
+    End Class
+    Public Class _Collection(Of T)
+        Private _Lock As New Object
+        Private _Buffer As T()
+        Private _Position As Integer
+        Private _Length As Integer
+        Public ReadOnly Property Size As Integer
+            Get
+                Return _Buffer.Length
+            End Get
+        End Property
+        Public ReadOnly Property Length As Integer
+            Get
+                Return _Length
+            End Get
+        End Property
+        Public ReadOnly Property FreeSpace As Integer
+            Get
+                Return Size - Length
+            End Get
+        End Property
+        Public Property Element(Index As Integer) As T
+            Get
+                If Index >= Length Then Throw New IndexOutOfRangeException()
+                Return _Buffer((_Position + Index) Mod Size)
+            End Get
+            Set(value As T)
+                If Index >= Length Then Throw New IndexOutOfRangeException()
+                _Buffer((_Position + Index) Mod Size) = value
+            End Set
+        End Property
+
+
+        Public Function UnsafeSetSize(Size As Integer, Forced As Boolean) As Boolean
+            If Not Forced AndAlso Size < _Length Then Return False
+            Dim Buffer = New Byte(Size - 1) {}
+            If _Position + _Length < _Buffer.Length Then
+                If Size >= _Length Then
+                    Array.Copy(_Buffer, _Position, Buffer, 0, _Length)
+                Else
+                    Array.Copy(_Buffer, _Position, Buffer, 0, Size)
+                End If
+            Else
+                If Size >= _Length Then
+                    Array.Copy(_Buffer, _Position, Buffer, 0, _Buffer.Length - _Position)
+
+                End If
+            End If
+        End Function
     End Class
 End Namespace

@@ -23,9 +23,6 @@ Namespace Updatables
         Protected Overridable Sub AsyncUpdate() Implements IAsyncObject.AsyncUpdate
             RaiseEvent AsyncUpdateEvent(Me)
         End Sub
-        Public Overrides Sub Destroy()
-            MyBase.Destroy()
-        End Sub
         Sub New()
         End Sub
         Sub New(Updater As Updaters.IUpdater)
