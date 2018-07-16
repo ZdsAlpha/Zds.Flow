@@ -226,47 +226,52 @@
             End Set
         End Property
 
+        Public Shared Property DefaultSize As Integer = 1024
+        Sub New()
+            Me.New(DefaultSize)
+        End Sub
         Sub New(Size As Integer)
             _Buffer = New T(Size - 1) {}
         End Sub
 
+        'Internal Methods
         Public Function _SetSize(Size As Integer, Forced As Boolean) As Boolean
+            If Size < 0 Then Return False
             If Not Forced AndAlso Size < _Length Then Return False
             Dim Buffer = New T(Size - 1) {}
-            If _Position + _Length < _Buffer.Length Then
-                If Size >= _Length Then
-                    Array.Copy(_Buffer, _Position, Buffer, 0, _Length)
-                Else
-                    Array.Copy(_Buffer, _Position, Buffer, 0, Size)
-                End If
-            Else
-                If Size >= _Length Then
-                    Array.Copy(_Buffer, _Position, Buffer, 0, _Buffer.Length - _Position)
-                    Array.Copy(_Buffer, 0, Buffer, _Buffer.Length - _Position, _Length - _Buffer.Length + _Position)
-                ElseIf Size > _Buffer.Length - _Position Then
-                    Array.Copy(_Buffer, _Position, Buffer, 0, _Buffer.Length - _Position)
-                    Array.Copy(_Buffer, 0, Buffer, _Buffer.Length - _Position, Size - _Buffer.Length + _Position)
-                Else
-                    Array.Copy(_Buffer, _Position, Buffer, 0, Size)
-                End If
-            End If
+            _CopyTo(Buffer, 0, 0, Size)
             _Buffer = Buffer
             _Position = 0
             If Size < _Length Then _Length = Size
             Return True
         End Function
+        Public Function _SetLength(Length As Integer, AutoResize As Boolean) As Boolean
+            If Length < 0 Then Return False
+            If Length > _Buffer.Length Then
+                If AutoResize Then
+                    _SetSize(Length, False)
+                Else
+                    Return False
+                End If
+            End If
+            _AddLast(Length)
+            Return True
+        End Function
         Public Function _AddFirst(Count As Integer) As Integer
+            If Count <= 0 Then Return 0
             If Count > FreeSpace Then Count = FreeSpace
-            _Position = (_Position - Count) Mod _Buffer.Length
+            _Position = Modulo(_Position - Count, _Buffer.Length)
             _Length += Count
             Return Count
         End Function
         Public Function _AddLast(Count As Integer) As Integer
+            If Count <= 0 Then Return 0
             If Count > FreeSpace Then Count = FreeSpace
             _Length += Count
             Return Count
         End Function
         Public Function _RemoveFirst(Count As Integer) As Integer
+            If Count <= 0 Then Return 0
             If Count > _Length Then Count = _Length
             If _Position + Count > _Buffer.Length Then
                 Array.Clear(_Buffer, _Position, _Buffer.Length - _Position)
@@ -274,26 +279,61 @@
             Else
                 Array.Clear(_Buffer, _Position, Count)
             End If
-            _Position = (_Position + Count) Mod _Buffer.Length
+            _Position = Modulo(_Position + Count, _Buffer.Length)
             _Length -= Count
             Return Count
         End Function
         Public Function _RemoveLast(Count As Integer) As Integer
             If Count > _Length Then Count = _Length
-            If _Position + _Length > _Buffer.Length And _Position + _Length - Count <= _Buffer.Length Then
+            If _Position + _Length > _Buffer.Length And _Position + _Length - Count < _Buffer.Length Then
                 Array.Clear(_Buffer, _Position + _Length - Count, _Buffer.Length - _Position - _Length + Count)
                 Array.Clear(_Buffer, 0, _Position + _Length - _Buffer.Length)
             Else
-                Array.Clear(_Buffer, _Position + _Length - Count, Count)
+                Array.Clear(_Buffer, Modulo(_Position + _Length - Count, _Buffer.Length), Count)
             End If
             _Length -= Count
             Return Count
         End Function
-        Public Function _CopyFrom(Source As T(), SourceIndex As Integer, DestinationIndex As Integer, Length As Integer) As Integer
-
-        End Function
         Public Function _CopyTo(Destination As T(), SourceIndex As Integer, DestinationIndex As Integer, Length As Integer) As Integer
+            If SourceIndex < 0 Or DestinationIndex < 0 Or Length <= 0 Then Return 0
+            If SourceIndex + Length > _Length Then Length = _Length - SourceIndex
+            If DestinationIndex + Length > Destination.Length Then Length = Destination.Length - DestinationIndex
+            If _Position + SourceIndex < _Buffer.Length And _Position + SourceIndex + Length > _Buffer.Length Then
+                Array.Copy(_Buffer, _Position + SourceIndex, Destination, DestinationIndex, _Buffer.Length - _Position - SourceIndex)
+                Array.Copy(_Buffer, 0, Destination, DestinationIndex + _Buffer.Length - _Position - SourceIndex, Length + _Position + SourceIndex - _Buffer.Length)
+            Else
+                Array.Copy(_Buffer, Modulo(_Position + SourceIndex, _Buffer.Length), Destination, DestinationIndex, Length)
+            End If
+            Return Length
+        End Function
+        Public Function _CopyFrom(Source As T(), SourceIndex As Integer, DestinationIndex As Integer, Length As Integer) As Integer
+            If SourceIndex < 0 Or DestinationIndex < 0 Or Length <= 0 Then Return 0
+            If SourceIndex + Length > Source.Length Then Length = Source.Length - SourceIndex
+            If DestinationIndex + Length > _Length Then Length = _Length - DestinationIndex
+            If _Position + DestinationIndex < _Buffer.Length And _Position + DestinationIndex + Length > _Buffer.Length Then
+                Array.Copy(Source, SourceIndex, _Buffer, _Position + DestinationIndex, _Buffer.Length - _Position - DestinationIndex)
+                Array.Copy(Source, SourceIndex + _Buffer.Length - _Position - DestinationIndex, _Buffer, 0, Length + _Position + DestinationIndex - _Buffer.Length)
+            Else
+                Array.Copy(Source, SourceIndex, _Buffer, Modulo(_Position + DestinationIndex, _Buffer.Length), Length)
+            End If
+            Return Length
+        End Function
+        Public Function _AddFirst(Elements As T(), Start As Integer, Length As Integer) As Integer
+            If Start < 0 Or Length <= 0 Then Return 0
+            If Start + Length > Elements.Length Then Length = Elements.Length - Start
+            Length = _AddFirst(Length)
+            Return _CopyFrom(Elements, Start, 0, Length)
+        End Function
+        Public Function _AddLast(Elements As T(), Start As Integer, Length As Integer) As Integer
+            If Start < 0 Or Length <= 0 Then Return 0
+            If Start + Length > Elements.Length Then Length = Elements.Length - Start
+            Length = _AddLast(Length)
+            Return _CopyFrom(Elements, Start, _Length - Length, Length)
+        End Function
 
+        'Shared Methods
+        Private Shared Function Modulo(Dividend As Integer, Divisor As Integer) As Integer
+            Return (Dividend Mod Divisor + Divisor) Mod Divisor
         End Function
     End Class
 End Namespace
