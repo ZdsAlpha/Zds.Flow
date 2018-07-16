@@ -4,9 +4,38 @@ Imports Zds.Flow.Machinery
 Imports Zds.Flow.Machinery.Updatables
 Imports Zds.Flow.Updatables
 Public Module Main
-    Dim frames As Integer = 0
     Public Sub Main()
-        MsgBox((New Byte(10) {}).Length)
+        Dim syncTicks As Integer = 0
+        Dim asyncTicks As Integer = 0
+        Dim Timer As New SyncTimer(Sub()
+                                       Console.Clear()
+                                       Dim st = syncTicks
+                                       Dim ast = asyncTicks
+                                       syncTicks = 0
+                                       asyncTicks = 0
+                                       Console.WriteLine("Sync Ticks = " + st.ToString)
+                                       Console.WriteLine("Async Ticks = " + ast.ToString)
+                                       Console.WriteLine("Async - Sync = " + (ast - st).ToString)
+                                       Console.WriteLine("Total Objects = " + Updatable.DefaultUpdater.Targets.Length.ToString)
+                                       Console.WriteLine("Threads = " + CType(Updatable.DefaultUpdater, Updaters.UpdaterX).Threads.Length.ToString)
+                                   End Sub)
+        Dim sync As New SyncObject(Sub()
+                                       syncTicks += 1
+                                   End Sub)
+        Dim async As New AsyncObject(Sub()
+                                         asyncTicks += 1
+                                     End Sub)
+        Timer.Start()
+        sync.Start()
+        async.Start()
+        For x = 0 To 10000
+            Dim k As New RigidStateMachine(Of Integer)
+            Threading.Thread.Sleep(10)
+        Next
+        Stop
+    End Sub
+    Dim frames As Integer = 0
+    Public Sub ScreenCapture()
         Dim Timer As New SyncTimer(AddressOf FPSUpdater)
         Timer.Start()
         Dim sc As New ScreenCapture

@@ -138,19 +138,21 @@
             RaiseEvent AnimateEvent(Me, State)
         End Sub
         Sub New()
-            Me.New(Nothing, Nothing)
-        End Sub
-        Sub New(Updater As Updaters.IUpdater)
-            Me.New(Updater, Nothing)
-        End Sub
-        Sub New(Animate As AnimateEventEventHandler)
-            Me.New(Nothing, Animate)
-        End Sub
-        Sub New(Updater As Updaters.IUpdater, Animate As AnimateEventEventHandler)
-            MyBase.New(Updater)
-            AddHandler AnimateEvent, Animate
             Delay = TimeSpan.FromSeconds(0.1)
             IsTolerant = False
+        End Sub
+        Sub New(Updater As Updaters.IUpdater)
+            MyBase.New(Updater)
+            Delay = TimeSpan.FromSeconds(0.1)
+            IsTolerant = False
+        End Sub
+        Sub New(Animate As AnimateEventEventHandler)
+            Me.New()
+            AddHandler AnimateEvent, Animate
+        End Sub
+        Sub New(Updater As Updaters.IUpdater, Animate As AnimateEventEventHandler)
+            Me.New(Updater)
+            AddHandler AnimateEvent, Animate
         End Sub
     End Class
 End Namespace

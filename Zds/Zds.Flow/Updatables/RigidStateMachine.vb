@@ -20,19 +20,21 @@
             RaiseEvent MachineEvent(Me, State, Time)
         End Sub
         Sub New()
-            Me.New(Nothing, Nothing)
-        End Sub
-        Sub New(MachineEvent As MachineEventEventHandler)
-            Me.New(Nothing, MachineEvent)
-        End Sub
-        Sub New(Updater As Updaters.IUpdater)
-            Me.New(Updater, Nothing)
-        End Sub
-        Sub New(Updater As Updaters.IUpdater, MachineEvent As MachineEventEventHandler)
-            MyBase.New(Updater)
-            AddHandler MachineEvent, MachineEvent
             Delay = TimeSpan.Zero
             IsTolerant = True
+        End Sub
+        Sub New(Updater As Updaters.IUpdater)
+            MyBase.New(Updater)
+            Delay = TimeSpan.Zero
+            IsTolerant = True
+        End Sub
+        Sub New(MachineEvent As MachineEventEventHandler)
+            Me.New()
+            AddHandler MachineEvent, MachineEvent
+        End Sub
+        Sub New(Updater As Updaters.IUpdater, MachineEvent As MachineEventEventHandler)
+            Me.New(Updater)
+            AddHandler MachineEvent, MachineEvent
         End Sub
     End Class
 End Namespace

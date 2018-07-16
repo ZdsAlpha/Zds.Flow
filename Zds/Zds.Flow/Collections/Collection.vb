@@ -195,7 +195,7 @@
 
 
     End Class
-    Public Class _Collection(Of T)
+    Public Class Round(Of T)
         Private _Lock As New Object
         Private _Buffer As T()
         Private _Position As Integer
@@ -215,7 +215,7 @@
                 Return Size - Length
             End Get
         End Property
-        Public Property Element(Index As Integer) As T
+        Default Public Property Element(Index As Integer) As T
             Get
                 If Index >= Length Then Throw New IndexOutOfRangeException()
                 Return _Buffer((_Position + Index) Mod Size)
@@ -226,10 +226,13 @@
             End Set
         End Property
 
+        Sub New(Size As Integer)
+            _Buffer = New T(Size - 1) {}
+        End Sub
 
-        Public Function UnsafeSetSize(Size As Integer, Forced As Boolean) As Boolean
+        Public Function _SetSize(Size As Integer, Forced As Boolean) As Boolean
             If Not Forced AndAlso Size < _Length Then Return False
-            Dim Buffer = New Byte(Size - 1) {}
+            Dim Buffer = New T(Size - 1) {}
             If _Position + _Length < _Buffer.Length Then
                 If Size >= _Length Then
                     Array.Copy(_Buffer, _Position, Buffer, 0, _Length)
@@ -239,9 +242,58 @@
             Else
                 If Size >= _Length Then
                     Array.Copy(_Buffer, _Position, Buffer, 0, _Buffer.Length - _Position)
-
+                    Array.Copy(_Buffer, 0, Buffer, _Buffer.Length - _Position, _Length - _Buffer.Length + _Position)
+                ElseIf Size > _Buffer.Length - _Position Then
+                    Array.Copy(_Buffer, _Position, Buffer, 0, _Buffer.Length - _Position)
+                    Array.Copy(_Buffer, 0, Buffer, _Buffer.Length - _Position, Size - _Buffer.Length + _Position)
+                Else
+                    Array.Copy(_Buffer, _Position, Buffer, 0, Size)
                 End If
             End If
+            _Buffer = Buffer
+            _Position = 0
+            If Size < _Length Then _Length = Size
+            Return True
+        End Function
+        Public Function _AddFirst(Count As Integer) As Integer
+            If Count > FreeSpace Then Count = FreeSpace
+            _Position = (_Position - Count) Mod _Buffer.Length
+            _Length += Count
+            Return Count
+        End Function
+        Public Function _AddLast(Count As Integer) As Integer
+            If Count > FreeSpace Then Count = FreeSpace
+            _Length += Count
+            Return Count
+        End Function
+        Public Function _RemoveFirst(Count As Integer) As Integer
+            If Count > _Length Then Count = _Length
+            If _Position + Count > _Buffer.Length Then
+                Array.Clear(_Buffer, _Position, _Buffer.Length - _Position)
+                Array.Clear(_Buffer, 0, Count + _Position - _Buffer.Length)
+            Else
+                Array.Clear(_Buffer, _Position, Count)
+            End If
+            _Position = (_Position + Count) Mod _Buffer.Length
+            _Length -= Count
+            Return Count
+        End Function
+        Public Function _RemoveLast(Count As Integer) As Integer
+            If Count > _Length Then Count = _Length
+            If _Position + _Length > _Buffer.Length And _Position + _Length - Count <= _Buffer.Length Then
+                Array.Clear(_Buffer, _Position + _Length - Count, _Buffer.Length - _Position - _Length + Count)
+                Array.Clear(_Buffer, 0, _Position + _Length - _Buffer.Length)
+            Else
+                Array.Clear(_Buffer, _Position + _Length - Count, Count)
+            End If
+            _Length -= Count
+            Return Count
+        End Function
+        Public Function _CopyFrom(Source As T(), SourceIndex As Integer, DestinationIndex As Integer, Length As Integer) As Integer
+
+        End Function
+        Public Function _CopyTo(Destination As T(), SourceIndex As Integer, DestinationIndex As Integer, Length As Integer) As Integer
+
         End Function
     End Class
 End Namespace
