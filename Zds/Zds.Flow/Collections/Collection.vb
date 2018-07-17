@@ -200,19 +200,9 @@
         Private _Buffer As T()
         Private _Position As Integer
         Private _Length As Integer
-        Public ReadOnly Property Size As Integer
-            Get
-                Return _Buffer.Length
-            End Get
-        End Property
         Public ReadOnly Property Length As Integer
             Get
                 Return _Length
-            End Get
-        End Property
-        Public ReadOnly Property FreeSpace As Integer
-            Get
-                Return Size - Length
             End Get
         End Property
         Default Public Property Element(Index As Integer) As T
@@ -225,6 +215,34 @@
                 _Buffer((_Position + Index) Mod Size) = value
             End Set
         End Property
+        Public ReadOnly Property Size As Integer
+            Get
+                Return _Buffer.Length
+            End Get
+        End Property
+        Public ReadOnly Property FreeSpace As Integer
+            Get
+                Return Size - Length
+            End Get
+        End Property
+        'Round / Array / Pipe
+        Public Function SetSize(Size As Integer, Optional Forced As Boolean = True) As Boolean
+            SyncLock _Lock
+                Return _SetSize(Size, Forced)
+            End SyncLock
+        End Function
+        Public Function SetLength(Length As Integer, Optional AutoResize As Boolean = True) As Boolean
+            SyncLock _Lock
+                Return _SetLength(Length, AutoResize)
+            End SyncLock
+        End Function
+
+        'Stream
+
+        'Queue
+
+        'Stack
+
 
         Public Shared Property DefaultSize As Integer = 1024
         Sub New()
@@ -235,7 +253,7 @@
         End Sub
 
         'Internal Methods
-        Public Function _SetSize(Size As Integer, Forced As Boolean) As Boolean
+        Protected Function _SetSize(Size As Integer, Forced As Boolean) As Boolean
             If Size < 0 Then Return False
             If Not Forced AndAlso Size < _Length Then Return False
             Dim Buffer = New T(Size - 1) {}
@@ -245,7 +263,7 @@
             If Size < _Length Then _Length = Size
             Return True
         End Function
-        Public Function _SetLength(Length As Integer, AutoResize As Boolean) As Boolean
+        Protected Function _SetLength(Length As Integer, AutoResize As Boolean) As Boolean
             If Length < 0 Then Return False
             If Length > _Buffer.Length Then
                 If AutoResize Then
@@ -257,20 +275,20 @@
             _AddLast(Length)
             Return True
         End Function
-        Public Function _AddFirst(Count As Integer) As Integer
+        Protected Function _AddFirst(Count As Integer) As Integer
             If Count <= 0 Then Return 0
             If Count > FreeSpace Then Count = FreeSpace
             _Position = Modulo(_Position - Count, _Buffer.Length)
             _Length += Count
             Return Count
         End Function
-        Public Function _AddLast(Count As Integer) As Integer
+        Protected Function _AddLast(Count As Integer) As Integer
             If Count <= 0 Then Return 0
             If Count > FreeSpace Then Count = FreeSpace
             _Length += Count
             Return Count
         End Function
-        Public Function _RemoveFirst(Count As Integer) As Integer
+        Protected Function _RemoveFirst(Count As Integer) As Integer
             If Count <= 0 Then Return 0
             If Count > _Length Then Count = _Length
             If _Position + Count > _Buffer.Length Then
@@ -283,7 +301,7 @@
             _Length -= Count
             Return Count
         End Function
-        Public Function _RemoveLast(Count As Integer) As Integer
+        Protected Function _RemoveLast(Count As Integer) As Integer
             If Count > _Length Then Count = _Length
             If _Position + _Length > _Buffer.Length And _Position + _Length - Count < _Buffer.Length Then
                 Array.Clear(_Buffer, _Position + _Length - Count, _Buffer.Length - _Position - _Length + Count)
@@ -294,7 +312,35 @@
             _Length -= Count
             Return Count
         End Function
-        Public Function _CopyTo(Destination As T(), SourceIndex As Integer, DestinationIndex As Integer, Length As Integer) As Integer
+        Protected Function _AddFirst(Element As T) As Boolean
+            If _Length = _Buffer.Length Then Return False
+            _Position = Modulo(_Position - 1, _Buffer.Length)
+            _Buffer(_Position) = Element
+            _Length += 1
+            Return True
+        End Function
+        Protected Function _AddLast(Element As T) As Boolean
+            If _Length = _Buffer.Length Then Return False
+            _Buffer((_Position + Length) Mod _Buffer.Length) = Element
+            _Length += 1
+            Return True
+        End Function
+        Protected Function _RemoveFirst(ByRef Element As T) As Boolean
+            If _Length = 0 Then Return False
+            Element = _Buffer(_Position)
+            _Buffer(_Position) = Nothing
+            _Position = (_Position + 1) Mod _Buffer.Length
+            _Length -= 1
+            Return True
+        End Function
+        Protected Function _RemoveLast(ByRef Element As T) As Boolean
+            If _Length = 0 Then Return False
+            Element = _Buffer((_Position + Length) Mod _Buffer.Length)
+            _Buffer((_Position + Length) Mod _Buffer.Length) = Nothing
+            _Length -= 1
+            Return True
+        End Function
+        Protected Function _CopyTo(Destination As T(), SourceIndex As Integer, DestinationIndex As Integer, Length As Integer) As Integer
             If SourceIndex < 0 Or DestinationIndex < 0 Or Length <= 0 Then Return 0
             If SourceIndex + Length > _Length Then Length = _Length - SourceIndex
             If DestinationIndex + Length > Destination.Length Then Length = Destination.Length - DestinationIndex
@@ -306,7 +352,7 @@
             End If
             Return Length
         End Function
-        Public Function _CopyFrom(Source As T(), SourceIndex As Integer, DestinationIndex As Integer, Length As Integer) As Integer
+        Protected Function _CopyFrom(Source As T(), SourceIndex As Integer, DestinationIndex As Integer, Length As Integer) As Integer
             If SourceIndex < 0 Or DestinationIndex < 0 Or Length <= 0 Then Return 0
             If SourceIndex + Length > Source.Length Then Length = Source.Length - SourceIndex
             If DestinationIndex + Length > _Length Then Length = _Length - DestinationIndex
@@ -318,15 +364,26 @@
             End If
             Return Length
         End Function
-        Public Function _AddFirst(Elements As T(), Start As Integer, Length As Integer) As Integer
+        Protected Function _AddFirst(Elements As T(), Start As Integer, Length As Integer, Overwrite As Boolean) As Integer
             If Start < 0 Or Length <= 0 Then Return 0
             If Start + Length > Elements.Length Then Length = Elements.Length - Start
+            If Overwrite Then
+                _RemoveLast(Length - FreeSpace)
+                If Length > _Buffer.Length Then Length = _Buffer.Length
+            End If
             Length = _AddFirst(Length)
             Return _CopyFrom(Elements, Start, 0, Length)
         End Function
-        Public Function _AddLast(Elements As T(), Start As Integer, Length As Integer) As Integer
+        Protected Function _AddLast(Elements As T(), Start As Integer, Length As Integer, Overwrite As Boolean) As Integer
             If Start < 0 Or Length <= 0 Then Return 0
             If Start + Length > Elements.Length Then Length = Elements.Length - Start
+            If Overwrite Then
+                _RemoveFirst(Length - FreeSpace)
+                If Length > _Buffer.Length Then
+                    Start = (Start + Length) - _Buffer.Length
+                    Length = _Buffer.Length
+                End If
+            End If
             Length = _AddLast(Length)
             Return _CopyFrom(Elements, Start, _Length - Length, Length)
         End Function

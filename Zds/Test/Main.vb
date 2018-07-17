@@ -5,10 +5,7 @@ Imports Zds.Flow.Machinery.Updatables
 Imports Zds.Flow.Updatables
 Public Module Main
     Public Sub Main()
-        Dim collection As New Collections.Round(Of Integer)(100)
-        collection._AddFirst({0, 1, 2, 3, 4}, 0, 5)
-        collection._AddFirst({-5, -4, -3, -2, -1}, 0, 5)
-        collection._AddLast({5, 6, 7, 8, 9}, 0, 5)
+        Dim collection As New Collections.Round(Of Integer)(10)
         Stop
     End Sub
     Dim frames As Integer = 0
