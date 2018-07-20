@@ -236,13 +236,113 @@
                 Return _SetLength(Length, AutoResize)
             End SyncLock
         End Function
+        Public Function AddFirst(Count As Integer) As Integer
+            SyncLock _Lock
+                Return _AddFirst(Count)
+            End SyncLock
+        End Function
+        Public Function AddLast(Count As Integer) As Integer
+            SyncLock _Lock
+                Return _AddLast(Count)
+            End SyncLock
+        End Function
+        Public Function AddFirst(Element As T) As Boolean
+            SyncLock _Lock
+                Return _AddFirst(Element)
+            End SyncLock
+        End Function
+        Public Function AddLast(Element As T) As Boolean
+            SyncLock _Lock
+                Return _AddLast(Element)
+            End SyncLock
+        End Function
+        Public Function AddFirst(Elements As T(), Start As Integer, Length As Integer, Optional Overwrite As Boolean = False) As Integer
+            SyncLock _Lock
+                Return _AddFirst(Elements, Start, Length, Overwrite)
+            End SyncLock
+        End Function
+        Public Function AddLast(Elements As T(), Start As Integer, Length As Integer, Optional Overwrite As Boolean = False) As Integer
+            SyncLock _Lock
+                Return _AddLast(Elements, Start, Length, Overwrite)
+            End SyncLock
+        End Function
+        Public Function AddFirst(Elements As T(), Optional Overwrite As Boolean = False) As Integer
+            Return AddFirst(Elements, 0, Elements.Length, Overwrite)
+        End Function
+        Public Function AddLast(Elements As T(), Optional Overwrite As Boolean = False) As Integer
+            Return AddLast(Elements, Overwrite)
+        End Function
+        Public Function RemoveFirst(Count As Integer) As Integer
+            SyncLock _Lock
+                Return _RemoveFirst(Count)
+            End SyncLock
+        End Function
+        Public Function RemoveLast(Count As Integer) As Integer
+            SyncLock _Lock
+                Return _RemoveLast(Count)
+            End SyncLock
+        End Function
+        Public Function RemoveFirst(ByRef Element As T) As Boolean
+            SyncLock _Lock
+                Return _RemoveFirst(Element)
+            End SyncLock
+        End Function
+        Public Function RemoveLast(ByRef Element As T) As Boolean
+            SyncLock _Lock
+                Return _RemoveLast(Element)
+            End SyncLock
+        End Function
+        Public Function CopyTo(Destination As T(), SourceIndex As Integer, DestinationIndex As Integer, Length As Integer) As Integer
+            SyncLock _Lock
+                Return _CopyTo(Destination, SourceIndex, DestinationIndex, Length)
+            End SyncLock
+        End Function
+        Public Function CopyFrom(Source As T(), SourceIndex As Integer, DestinationIndex As Integer, Length As Integer) As Integer
+            SyncLock _Lock
+                Return _CopyFrom(Source, SourceIndex, DestinationIndex, Length)
+            End SyncLock
+        End Function
 
         'Stream
+        Public Function Write(Elements As T(), Start As Integer, Length As Integer) As Integer
+            SyncLock _Lock
+                Dim count = AddLast(Length)
+                Return CopyFrom(Elements, Start, Me.Length - count, count)
+            End SyncLock
+        End Function
+        Public Function Read(Elements As T(), Start As Integer, Length As Integer) As Integer
+            SyncLock _Lock
+                Dim count = CopyTo(Elements, 0, Start, Length)
+                Return RemoveFirst(count)
+            End SyncLock
+        End Function
+        Public Function Write(Elements As T()) As Integer
+            Return Write(Elements, 0, Elements.Length)
+        End Function
+        Public Function Read(Elements As T()) As Integer
+            Return Read(Elements, 0, Elements.Length)
+        End Function
 
         'Queue
+        Public Function Enqueue(Element As T) As Boolean
+            Return AddLast(Element)
+        End Function
+        Public Function Dequeue(ByRef Element As T) As Boolean
+            Return RemoveFirst(Element)
+        End Function
 
         'Stack
+        Public Function Push(Element As T) As Boolean
+            Return Enqueue(Element)
+        End Function
+        Public Function Pop(ByRef Element As T) As Boolean
+            Return RemoveLast(Element)
+        End Function
 
+        'Others
+        Public Sub Clear()
+            SetLength(0)
+        End Sub
 
         Public Shared Property DefaultSize As Integer = 1024
         Sub New()
