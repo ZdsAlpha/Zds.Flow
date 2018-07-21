@@ -2,17 +2,10 @@
 
 Namespace Machinery.Core
     Public Class SyncSink(Of Input)
-        Implements ISink(Of Input)
-        Public Property Sink As SinkDelegate
-        Public Property Buffer As IQueue(Of Input)
-        Public Property Recursive As Boolean = True Implements ISink(Of Input).Recursive
+        Inherits Sink(Of Input)
         Private HasValue As Boolean
         Private Value As Input
-        Public Function Receive(obj As Input) As Boolean Implements ISink(Of Input).Receive
-            If Buffer Is Nothing Then Return Nothing
-            Return Buffer.Enqueue(obj)
-        End Function
-        Public Sub Activate() Implements ISink(Of Input).Activate
+        Public Overrides Sub Activate()
             Dim _Buffer = Buffer
             If _Buffer IsNot Nothing AndAlso Not HasValue Then HasValue = _Buffer.Dequeue(Value)
             Do
@@ -26,20 +19,16 @@ Namespace Machinery.Core
             Loop While Recursive
         End Sub
         Sub New()
-            Buffer = New Round(Of Input)()
+            MyBase.New
         End Sub
         Sub New(Buffer As IQueue(Of Input))
-            Me.Buffer = Buffer
+            MyBase.New(Buffer)
         End Sub
         Sub New(Sink As SinkDelegate)
-            Me.New()
-            Me.Sink = Sink
+            MyBase.New(Sink)
         End Sub
         Sub New(Buffer As IQueue(Of Input), Sink As SinkDelegate)
-            Me.New(Buffer)
-            Me.Sink = Sink
+            MyBase.New(Buffer, Sink)
         End Sub
-
-        Public Delegate Function SinkDelegate(obj As Input) As Boolean
     End Class
 End Namespace

@@ -1,12 +1,9 @@
 ﻿Namespace Machinery.Core
     Public Class SyncSource(Of Output)
-        Implements ISource(Of Output)
-        Public Property Sink As ISink(Of Output) Implements ISource(Of Output).Sink
-        Public Property Generate As GenerateDelegate
-        Public Property Dropping As Boolean = True Implements ISource(Of Output).Dropping
+        Inherits Source(Of Output)
         Private HasValue As Boolean
         Private Value As Output
-        Public Sub Activate() Implements ISource(Of Output).Activate
+        Public Overrides Sub Activate()
             Dim _Sink = Sink
             If Not HasValue Then HasValue = Generate(Value)
             If HasValue Then
@@ -23,11 +20,10 @@
             End If
         End Sub
         Sub New()
+            MyBase.New()
         End Sub
         Sub New(Generate As GenerateDelegate)
-            Me.Generate = Generate
+            MyBase.New(Generate)
         End Sub
-
-        Public Delegate Function GenerateDelegate(ByRef obj As Output) As Boolean
     End Class
 End Namespace

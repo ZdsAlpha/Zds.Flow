@@ -57,7 +57,7 @@
     <Import Include="System.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Collections\Collection.vb" />
+    <Compile Include="Collections\Round.vb" />
     <Compile Include="Collections\SafeList.vb" />
     <Compile Include="DelayHandlers\ConstantSleep.vb" />
     <Compile Include="DelayHandlers\Sleep.vb" />
@@ -93,6 +93,9 @@
     <Compile Include="Interfaces\ITimer.vb" />
     <Compile Include="Interfaces\IUpdatable.vb" />
     <Compile Include="Interfaces\IUpdater.vb" />
+    <Compile Include="Machinery\Core\Converter.vb" />
+    <Compile Include="Machinery\Core\Sink.vb" />
+    <Compile Include="Machinery\Core\Source.vb" />
     <Compile Include="Machinery\Core\SyncConverter.vb" />
     <Compile Include="Machinery\Machinery.vb" />
     <Compile Include="Machinery\Core\SyncSink.vb" />
