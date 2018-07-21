@@ -26,7 +26,7 @@ Namespace Machinery.Core
             Loop While Recursive
         End Sub
         Sub New()
-            Buffer = New Collection(Of Input)(4096)
+            Buffer = New Round(Of Input)()
         End Sub
         Sub New(Buffer As IQueue(Of Input))
             Me.Buffer = Buffer
