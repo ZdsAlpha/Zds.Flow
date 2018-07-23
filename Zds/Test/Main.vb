@@ -1,12 +1,12 @@
 Imports System.Drawing
 Imports Zds.Flow
 Imports Zds.Flow.Machinery
-Imports Zds.Flow.Machinery.Updatables
+Imports Zds.Flow.Machinery.Objects
 Imports Zds.Flow.Updatables
 Public Module Main
     Public Sub Main()
-        Dim collection As New Collections.Round(Of Integer)(10)
-        Stop
+        Dim Updater As Updaters.UpdaterX = Updatable.DefaultUpdater
+
     End Sub
     Dim frames As Integer = 0
     Public Sub ScreenCapture()
@@ -31,12 +31,8 @@ Public Class ScreenCapture
     Private Generator As New SyncSource(Of Tuple(Of Bitmap, DateTime))(AddressOf Generate)
     Private Processor As New SyncConverter(Of Tuple(Of Bitmap, DateTime), Tuple(Of Byte(), DateTime))(AddressOf Process) With {.MustConvert = True}
     Private Flusher As New SyncSink(Of Tuple(Of Byte(), DateTime))(AddressOf Flush)
-    Private Random1 As New Random
-    Private Random2 As New Random
-    Private Random3 As New Random
     Public Event OnFinishedFrame()
     Private Function Generate(ByRef output As Tuple(Of Bitmap, DateTime)) As Boolean
-        If Random1.NextDouble >= 0.5 Then Return False
         Dim time As DateTime
         Dim screens = Windows.Forms.Screen.AllScreens
         Dim bounds = screens(0).Bounds
@@ -49,7 +45,6 @@ Public Class ScreenCapture
         Return True
     End Function
     Private Function Process(input As Tuple(Of Bitmap, DateTime), ByRef output As Tuple(Of Byte(), DateTime)) As Boolean
-        If Random2.NextDouble >= 0.5 Then Return False
         Dim bytes As Byte() = Nothing
         Using stream As New IO.MemoryStream()
             input.Item1.Save(stream, Imaging.ImageFormat.Jpeg)
@@ -60,7 +55,6 @@ Public Class ScreenCapture
         Return True
     End Function
     Private Function Flush(input As Tuple(Of Byte(), DateTime)) As Boolean
-        If Random3.NextDouble >= 0.5 Then Return False
         IO.File.WriteAllBytes(Directory + input.Item2.ToString("yyyy-MM-dd HH:mm:ss.fff").Replace("/", "_").Replace("\", "_").Replace(":", "_") + ".jpg", input.Item1)
         RaiseEvent OnFinishedFrame()
         Return True

@@ -5,7 +5,7 @@ Namespace Machinery.Core
         Implements ISink(Of Input)
         Public Property Sink As SinkDelegate
         Public Property Buffer As IQueue(Of Input)
-        Public Property Recursive As Boolean = True Implements ISink(Of Input).Recursive
+        Public Property Recursive As Boolean = True
         Public Function Receive(obj As Input) As Boolean Implements ISink(Of Input).Receive
             If Buffer Is Nothing Then Return Nothing
             Return Buffer.Enqueue(obj)

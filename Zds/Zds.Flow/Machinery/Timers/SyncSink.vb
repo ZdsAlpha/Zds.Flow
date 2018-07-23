@@ -1,13 +1,12 @@
 ﻿Imports Zds.Flow.Updatables
 
-Namespace Machinery.Updatables
+Namespace Machinery.Timers
     Public Class SyncSink(Of Input)
-        Inherits SyncObject
+        Inherits SyncTimer
         Implements ISink(Of Input)
         Private _Sink As Core.SyncSink(Of Input)
         Public Property SinkDelegate As Core.SyncSink(Of Input).SinkDelegate
-        Public Property Buffer As Collections.IQueue(Of Input)
-        Public Property Recursive As Boolean Implements ISink(Of Input).Recursive
+        Public Property Recursive As Boolean
             Get
                 Return _Sink.Recursive
             End Get
@@ -15,11 +14,19 @@ Namespace Machinery.Updatables
                 _Sink.Recursive = value
             End Set
         End Property
+        Public Property Buffer As Collections.IQueue(Of Input)
+            Get
+                Return _Sink.Buffer
+            End Get
+            Set(value As Collections.IQueue(Of Input))
+                _Sink.Buffer = value
+            End Set
+        End Property
         Public Function Receive(obj As Input) As Boolean Implements ISink(Of Input).Receive
             Return _Sink.Receive(obj)
         End Function
-        Protected Overrides Sub SyncUpdate()
-            MyBase.SyncUpdate()
+        Protected Overrides Sub Tick(ByRef Time As TimeSpan)
+            MyBase.Tick(Time)
             _Sink.Activate()
         End Sub
         Private Function InternalSink(Input As Input) As Boolean

@@ -1,25 +1,25 @@
 ﻿Imports Zds.Flow.Updatables
 
-Namespace Machinery.Updatables
+Namespace Machinery.Objects
     Public Class SyncSource(Of Output)
         Inherits SyncObject
         Implements ISource(Of Output)
         Private _Source As Core.SyncSource(Of Output)
         Public Property GenerateDelegate As Core.SyncSource(Of Output).GenerateDelegate
+        Public Property Dropping As Boolean
+            Get
+                Return _Source.Dropping
+            End Get
+            Set(value As Boolean)
+                _Source.Dropping = value
+            End Set
+        End Property
         Public Property Sink As ISink(Of Output) Implements ISource(Of Output).Sink
             Get
                 Return _Source.Sink
             End Get
             Set(value As ISink(Of Output))
                 _Source.Sink = value
-            End Set
-        End Property
-        Public Property Dropping As Boolean Implements ISource(Of Output).Dropping
-            Get
-                Return _Source.Dropping
-            End Get
-            Set(value As Boolean)
-                _Source.Dropping = value
             End Set
         End Property
         Protected Overrides Sub SyncUpdate()

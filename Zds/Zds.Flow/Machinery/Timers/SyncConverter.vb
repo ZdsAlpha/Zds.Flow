@@ -1,17 +1,33 @@
 ﻿Imports Zds.Flow.Updatables
 
-Namespace Machinery.Updatables
+Namespace Machinery.Timers
     Public Class SyncConverter(Of Input, Output)
-        Inherits SyncObject
+        Inherits SyncTimer
         Implements IConverter(Of Input, Output)
         Private _Converter As Core.SyncConverter(Of Input, Output)
         Public Property ConvertDelegate As Core.SyncConverter(Of Input, Output).ConvertDelegate
-        Public Property Sink As ISink(Of Output) Implements ISource(Of Output).Sink
+        Public Property Dropping As Boolean
             Get
-                Return _Converter.Sink
+                Return _Converter.Dropping
             End Get
-            Set(value As ISink(Of Output))
-                _Converter.Sink = value
+            Set(value As Boolean)
+                _Converter.Dropping = value
+            End Set
+        End Property
+        Public Property Recursive As Boolean
+            Get
+                Return _Converter.Recursive
+            End Get
+            Set(value As Boolean)
+                _Converter.Recursive = value
+            End Set
+        End Property
+        Public Property MustConvert As Boolean
+            Get
+                Return _Converter.MustConvert
+            End Get
+            Set(value As Boolean)
+                _Converter.MustConvert = value
             End Set
         End Property
         Public Property Buffer As Collections.IQueue(Of Input)
@@ -22,35 +38,19 @@ Namespace Machinery.Updatables
                 _Converter.Buffer = value
             End Set
         End Property
-        Public Property Dropping As Boolean Implements ISource(Of Output).Dropping
+        Public Property Sink As ISink(Of Output) Implements ISource(Of Output).Sink
             Get
-                Return _Converter.Dropping
+                Return _Converter.Sink
             End Get
-            Set(value As Boolean)
-                _Converter.Dropping = value
-            End Set
-        End Property
-        Public Property Recursive As Boolean Implements ISink(Of Input).Recursive
-            Get
-                Return _Converter.Recursive
-            End Get
-            Set(value As Boolean)
-                _Converter.Recursive = value
-            End Set
-        End Property
-        Public Property MustConvert As Boolean Implements IConverter(Of Input, Output).MustConvert
-            Get
-                Return _Converter.MustConvert
-            End Get
-            Set(value As Boolean)
-                _Converter.MustConvert = value
+            Set(value As ISink(Of Output))
+                _Converter.Sink = value
             End Set
         End Property
         Public Function Receive(obj As Input) As Boolean Implements ISink(Of Input).Receive
             Return _Converter.Receive(obj)
         End Function
-        Protected Overrides Sub SyncUpdate()
-            MyBase.SyncUpdate()
+        Protected Overrides Sub Tick(ByRef Time As TimeSpan)
+            MyBase.Tick(Time)
             _Converter.Activate()
         End Sub
         Private Function InternalConvert(Input As Input, ByRef Output As Output) As Boolean

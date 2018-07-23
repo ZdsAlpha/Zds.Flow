@@ -6,9 +6,9 @@ Namespace Machinery.Core
         Public Property Sink As ISink(Of Output) Implements ISource(Of Output).Sink
         Public Property Convert As ConvertDelegate
         Public Property Buffer As IQueue(Of Input)
-        Public Property Dropping As Boolean = True Implements ISource(Of Output).Dropping
-        Public Property Recursive As Boolean = True Implements ISink(Of Input).Recursive
-        Public Property MustConvert As Boolean = False Implements IConverter(Of Input, Output).MustConvert
+        Public Property Dropping As Boolean = True
+        Public Property Recursive As Boolean = True
+        Public Property MustConvert As Boolean = False
         Public Function Receive(obj As Input) As Boolean Implements ISink(Of Input).Receive
             If Buffer Is Nothing Then Return Nothing
             Return Buffer.Enqueue(obj)
