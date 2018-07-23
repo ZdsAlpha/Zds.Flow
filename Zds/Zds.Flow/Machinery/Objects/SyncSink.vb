@@ -14,12 +14,12 @@ Namespace Machinery.Objects
                 _Sink.Recursive = value
             End Set
         End Property
-        Public Property Buffer As Collections.IQueue(Of Input)
+        Public Property Queue As Collections.IQueue(Of Input)
             Get
-                Return _Sink.Buffer
+                Return _Sink.Queue
             End Get
             Set(value As Collections.IQueue(Of Input))
-                _Sink.Buffer = value
+                _Sink.Queue = value
             End Set
         End Property
         Public Function Receive(obj As Input) As Boolean Implements ISink(Of Input).Receive

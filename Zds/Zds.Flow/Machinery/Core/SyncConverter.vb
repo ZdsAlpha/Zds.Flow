@@ -9,7 +9,7 @@ Namespace Machinery.Core
         Private Converted As Output
         Public Overrides Sub Activate()
             Dim _Sink = Sink
-            Dim _Buffer = Buffer
+            Dim _Buffer = Queue
             If _Buffer IsNot Nothing AndAlso Not HasValue Then HasValue = _Buffer.Dequeue(Value)
             Do
                 'Sinking converted value

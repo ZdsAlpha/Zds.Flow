@@ -30,12 +30,12 @@ Namespace Machinery.Objects
                 _Converter.MustConvert = value
             End Set
         End Property
-        Public Property Buffer As Collections.IQueue(Of Input)
+        Public Property Queue As Collections.IQueue(Of Input)
             Get
-                Return _Converter.Buffer
+                Return _Converter.Queue
             End Get
             Set(value As Collections.IQueue(Of Input))
-                _Converter.Buffer = value
+                _Converter.Queue = value
             End Set
         End Property
         Public Property Sink As ISink(Of Output) Implements ISource(Of Output).Sink

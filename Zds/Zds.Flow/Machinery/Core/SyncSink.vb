@@ -6,7 +6,7 @@ Namespace Machinery.Core
         Private HasValue As Boolean
         Private Value As Input
         Public Overrides Sub Activate()
-            Dim _Buffer = Buffer
+            Dim _Buffer = Queue
             If _Buffer IsNot Nothing AndAlso Not HasValue Then HasValue = _Buffer.Dequeue(Value)
             Do
                 If HasValue AndAlso Sink(Value) Then

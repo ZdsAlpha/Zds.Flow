@@ -5,20 +5,20 @@ Namespace Machinery.Core
         Implements IConverter(Of Input, Output)
         Public Property Sink As ISink(Of Output) Implements ISource(Of Output).Sink
         Public Property Convert As ConvertDelegate
-        Public Property Buffer As IQueue(Of Input)
+        Public Property Queue As IQueue(Of Input)
         Public Property Dropping As Boolean = True
         Public Property Recursive As Boolean = True
         Public Property MustConvert As Boolean = False
         Public Function Receive(obj As Input) As Boolean Implements ISink(Of Input).Receive
-            If Buffer Is Nothing Then Return Nothing
-            Return Buffer.Enqueue(obj)
+            If Queue Is Nothing Then Return Nothing
+            Return Queue.Enqueue(obj)
         End Function
         Public MustOverride Sub Activate() Implements IConverter(Of Input, Output).Activate
         Sub New()
-            Buffer = New Round(Of Input)()
+            Queue = New Round(Of Input)()
         End Sub
         Sub New(Buffer As IQueue(Of Input))
-            Me.Buffer = Buffer
+            Me.Queue = Buffer
         End Sub
         Sub New(Process As ConvertDelegate)
             Me.New()

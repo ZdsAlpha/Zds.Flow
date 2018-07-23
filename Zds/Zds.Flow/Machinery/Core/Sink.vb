@@ -4,18 +4,18 @@ Namespace Machinery.Core
     Public MustInherit Class Sink(Of Input)
         Implements ISink(Of Input)
         Public Property Sink As SinkDelegate
-        Public Property Buffer As IQueue(Of Input)
+        Public Property Queue As IQueue(Of Input)
         Public Property Recursive As Boolean = True
         Public Function Receive(obj As Input) As Boolean Implements ISink(Of Input).Receive
-            If Buffer Is Nothing Then Return Nothing
-            Return Buffer.Enqueue(obj)
+            If Queue Is Nothing Then Return Nothing
+            Return Queue.Enqueue(obj)
         End Function
         Public MustOverride Sub Activate() Implements ISink(Of Input).Activate
         Sub New()
-            Buffer = New Round(Of Input)()
+            Queue = New Round(Of Input)()
         End Sub
         Sub New(Buffer As IQueue(Of Input))
-            Me.Buffer = Buffer
+            Me.Queue = Buffer
         End Sub
         Sub New(Sink As SinkDelegate)
             Me.New()
