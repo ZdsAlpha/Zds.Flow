@@ -19,7 +19,6 @@ Public Module Main
         sc.ExceptionHandler = consoleLogger
         AddHandler sc.OnFinishedFrame, Sub() frames += 1
         sc.Start()
-
     End Sub
     Public Sub FPSUpdater()
         Console.Title = frames.ToString + " fps"

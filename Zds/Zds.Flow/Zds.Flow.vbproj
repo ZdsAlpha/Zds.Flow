@@ -57,6 +57,7 @@
     <Import Include="System.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Collections\DynamicRound.vb" />
     <Compile Include="Collections\Round.vb" />
     <Compile Include="Collections\SafeList.vb" />
     <Compile Include="DelayHandlers\ConstantSleep.vb" />
