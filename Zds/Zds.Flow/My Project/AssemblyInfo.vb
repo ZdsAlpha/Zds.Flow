@@ -11,8 +11,8 @@ Imports System.Runtime.InteropServices
 <Assembly: AssemblyTitle("Zds.Flow")>
 <Assembly: AssemblyDescription("Controls flow of execution of program")>
 <Assembly: AssemblyCompany("ZdSoft")>
-<Assembly: AssemblyProduct("Zds.Flow")> 
-<Assembly: AssemblyCopyright("Copyright ©  2016")>
+<Assembly: AssemblyProduct("Zds.Flow")>
+<Assembly: AssemblyCopyright("Copyright ©  2018")>
 <Assembly: AssemblyTrademark("ZdsAlpha")>
 
 <Assembly: ComVisible(False)>

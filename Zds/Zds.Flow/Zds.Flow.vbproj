@@ -94,6 +94,7 @@
     <Compile Include="Interfaces\Updatables\ITimer.vb" />
     <Compile Include="Interfaces\Updatables\IUpdatable.vb" />
     <Compile Include="Interfaces\Updaters\IUpdater.vb" />
+    <Compile Include="Machinery\Core\AsyncSource.vb" />
     <Compile Include="Machinery\Core\Converter.vb" />
     <Compile Include="Machinery\Core\Sink.vb" />
     <Compile Include="Machinery\Core\Source.vb" />

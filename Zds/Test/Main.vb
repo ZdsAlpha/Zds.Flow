@@ -6,7 +6,6 @@ Imports Zds.Flow.Updatables
 Public Module Main
     Public Sub Main()
         Dim Updater As Updaters.UpdaterX = Updatable.DefaultUpdater
-
     End Sub
     Dim frames As Integer = 0
     Public Sub ScreenCapture()
