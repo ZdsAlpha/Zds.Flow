@@ -110,6 +110,9 @@
     <Compile Include="Machinery\Objects\SyncConverter.vb" />
     <Compile Include="Machinery\Objects\SyncSink.vb" />
     <Compile Include="Machinery\Objects\SyncSource.vb" />
+    <Compile Include="Machinery\Timers\AsyncConverter.vb" />
+    <Compile Include="Machinery\Timers\AsyncSink.vb" />
+    <Compile Include="Machinery\Timers\AsyncSource.vb" />
     <Compile Include="Machinery\Timers\SyncConverter.vb" />
     <Compile Include="Machinery\Timers\SyncSink.vb" />
     <Compile Include="Machinery\Timers\SyncSource.vb" />
