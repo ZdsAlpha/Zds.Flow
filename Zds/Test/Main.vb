@@ -6,6 +6,7 @@ Imports Zds.Flow.Updatables
 Public Module Main
     Public Sub Main()
         Dim Updater As Updaters.UpdaterX = Updatable.DefaultUpdater
+        ScreenCapture()
     End Sub
     Dim frames As Integer = 0
     Public Sub ScreenCapture()
@@ -27,7 +28,7 @@ End Module
 Public Class ScreenCapture
     Inherits Machinery
     Public Property Directory As String = "Images\"
-    Private Generator As New SyncSource(Of Tuple(Of Bitmap, DateTime))(AddressOf Generate)
+    Private Generator As New SyncSource(Of Tuple(Of Bitmap, DateTime))(AddressOf Generate) With {.Dropping = True}
     Private Processor As New SyncConverter(Of Tuple(Of Bitmap, DateTime), Tuple(Of Byte(), DateTime))(AddressOf Process) With {.MustConvert = True}
     Private Flusher As New SyncSink(Of Tuple(Of Byte(), DateTime))(AddressOf Flush)
     Public Event OnFinishedFrame()

@@ -9,8 +9,8 @@ Namespace Machinery.Core
         Private Converted As Output
         Public Overrides Sub Activate()
             Dim _Sink = Sink
-            Dim _Buffer = Queue
-            If _Buffer IsNot Nothing AndAlso Not HasValue Then HasValue = _Buffer.Dequeue(Value)
+            Dim _Queue = Queue
+            If _Queue IsNot Nothing AndAlso Not HasValue Then HasValue = _Queue.Dequeue(Value)
             Do
                 'Sinking converted value
                 If HasConverted Then
@@ -29,18 +29,15 @@ Namespace Machinery.Core
                 If HasValue And Not HasConverted Then
                     If Convert(Value, Converted) Then
                         HasConverted = True
-                        HasValue = False
-                        Value = Nothing
-                    ElseIf Not MustConvert Then
-                        HasValue = False
-                        Value = Nothing
-                    Else
+                    ElseIf MustConvert Then
                         Exit Do
                     End If
+                    HasValue = False
+                    Value = Nothing
                 Else
                     Exit Do
                 End If
-                If _Buffer IsNot Nothing Then HasValue = _Buffer.Dequeue(Value)
+                If _Queue IsNot Nothing Then HasValue = _Queue.Dequeue(Value)
             Loop While Recursive
         End Sub
         Sub New()

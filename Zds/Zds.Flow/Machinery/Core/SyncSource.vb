@@ -7,15 +7,9 @@
             Dim _Sink = Sink
             If Not HasValue Then HasValue = Generate(Value)
             If HasValue Then
-                If Dropping Then
-                    If _Sink IsNot Nothing Then _Sink.Receive(Value)
+                If (_Sink IsNot Nothing AndAlso _Sink.Receive(Value)) OrElse Dropping Then
                     HasValue = False
                     Value = Nothing
-                Else
-                    If _Sink IsNot Nothing AndAlso _Sink.Receive(Value) Then
-                        HasValue = False
-                        Value = Nothing
-                    End If
                 End If
             End If
         End Sub

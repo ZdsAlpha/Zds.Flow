@@ -3,7 +3,7 @@
         Implements ISource(Of Output)
         Public Property Sink As ISink(Of Output) Implements ISource(Of Output).Sink
         Public Property Generate As GenerateDelegate
-        Public Property Dropping As Boolean = True
+        Public Property Dropping As Boolean = False
         Public MustOverride Sub Activate() Implements ISource(Of Output).Activate
         Sub New()
         End Sub

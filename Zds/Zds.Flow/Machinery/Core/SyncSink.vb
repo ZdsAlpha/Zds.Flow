@@ -6,8 +6,8 @@ Namespace Machinery.Core
         Private HasValue As Boolean
         Private Value As Input
         Public Overrides Sub Activate()
-            Dim _Buffer = Queue
-            If _Buffer IsNot Nothing AndAlso Not HasValue Then HasValue = _Buffer.Dequeue(Value)
+            Dim _Queue = Queue
+            If _Queue IsNot Nothing AndAlso Not HasValue Then HasValue = _Queue.Dequeue(Value)
             Do
                 If HasValue AndAlso Sink(Value) Then
                     HasValue = False
@@ -15,7 +15,7 @@ Namespace Machinery.Core
                 Else
                     Exit Do
                 End If
-                If _Buffer IsNot Nothing Then HasValue = _Buffer.Dequeue(Value)
+                If _Queue IsNot Nothing Then HasValue = _Queue.Dequeue(Value)
             Loop While Recursive
         End Sub
         Sub New()
