@@ -25,18 +25,6 @@ Namespace Machinery.Core
                 ElseIf Not Dropping Then
                     Values.Enqueue(Value)
                 End If
-                If Dropping Then
-                    If _Sink IsNot Nothing Then _Sink.Receive(Value)
-                    HasValue = False
-                    Value = Nothing
-                Else
-                    If _Sink IsNot Nothing AndAlso _Sink.Receive(Value) Then
-                        HasValue = False
-                        Value = Nothing
-                    Else
-                        Values.Enqueue(Value)
-                    End If
-                End If
             End If
             Threading.Interlocked.Decrement(Threads)
         End Sub

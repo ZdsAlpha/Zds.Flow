@@ -1,10 +1,10 @@
 ﻿Imports Zds.Flow.Updatables
 
 Namespace Machinery.Objects
-    Public Class SyncSource(Of Output)
-        Inherits SyncObject
+    Public Class AsyncSource(Of Output)
+        Inherits AsyncObject
         Implements ISource(Of Output)
-        Private _Source As Core.SyncSource(Of Output)
+        Private _Source As Core.AsyncSource(Of Output)
         Public Property GenerateDelegate As Core.Source(Of Output).GenerateDelegate
         Public Property Dropping As Boolean
             Get
@@ -22,8 +22,8 @@ Namespace Machinery.Objects
                 _Source.Sink = value
             End Set
         End Property
-        Protected Overrides Sub SyncUpdate()
-            MyBase.SyncUpdate()
+        Protected Overrides Sub AsyncUpdate()
+            MyBase.AsyncUpdate()
             _Source.Activate()
         End Sub
         Private Function InternalGenerate(ByRef Output As Output) As Boolean
@@ -38,7 +38,7 @@ Namespace Machinery.Objects
             If GenerateDelegate IsNot Nothing Then Return GenerateDelegate(Output) Else Return False
         End Function
         Sub New()
-            _Source = New Core.SyncSource(Of Output)
+            _Source = New Core.AsyncSource(Of Output)
             _Source.Generate = AddressOf InternalGenerate
         End Sub
         Sub New(Generate As Core.Source(Of Output).GenerateDelegate)
@@ -47,7 +47,7 @@ Namespace Machinery.Objects
         End Sub
         Sub New(Updater As Updaters.IUpdater)
             MyBase.New(Updater)
-            _Source = New Core.SyncSource(Of Output)
+            _Source = New Core.AsyncSource(Of Output)
             _Source.Generate = AddressOf InternalGenerate
         End Sub
         Sub New(Updater As Updaters.IUpdater, Generate As Core.Source(Of Output).GenerateDelegate)

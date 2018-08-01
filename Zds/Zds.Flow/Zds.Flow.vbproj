@@ -104,6 +104,7 @@
     <Compile Include="Machinery\Machinery.vb" />
     <Compile Include="Machinery\Core\SyncSink.vb" />
     <Compile Include="Machinery\Core\SyncSource.vb" />
+    <Compile Include="Machinery\Objects\AsyncSource.vb" />
     <Compile Include="Machinery\Objects\SyncConverter.vb" />
     <Compile Include="Machinery\Objects\SyncSink.vb" />
     <Compile Include="Machinery\Objects\SyncSource.vb" />
