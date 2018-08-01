@@ -14,15 +14,9 @@ Namespace Machinery.Core
             Do
                 'Sinking converted value
                 If HasConverted Then
-                    If Dropping Then
-                        If _Sink IsNot Nothing Then _Sink.Receive(Converted)
+                    If (_Sink IsNot Nothing AndAlso _Sink.Receive(Converted)) OrElse Dropping Then
                         HasConverted = False
                         Converted = Nothing
-                    Else
-                        If _Sink IsNot Nothing AndAlso _Sink.Receive(Converted) Then
-                            HasConverted = False
-                            Converted = Nothing
-                        End If
                     End If
                 End If
                 'Converting input value

@@ -1,10 +1,10 @@
 ﻿Imports Zds.Flow.Updatables
 
 Namespace Machinery.Objects
-    Public Class SyncConverter(Of Input, Output)
-        Inherits SyncObject
+    Public Class ASyncConverter(Of Input, Output)
+        Inherits AsyncObject
         Implements IConverter(Of Input, Output)
-        Private _Converter As Core.SyncConverter(Of Input, Output)
+        Private _Converter As Core.AsyncConverter(Of Input, Output)
         Public Property ConvertDelegate As Core.Converter(Of Input, Output).ConvertDelegate
         Public Property Dropping As Boolean
             Get
@@ -49,8 +49,8 @@ Namespace Machinery.Objects
         Public Function Receive(obj As Input) As Boolean Implements ISink(Of Input).Receive
             Return _Converter.Receive(obj)
         End Function
-        Protected Overrides Sub SyncUpdate()
-            MyBase.SyncUpdate()
+        Protected Overrides Sub AsyncUpdate()
+            MyBase.AsyncUpdate()
             _Converter.Activate()
         End Sub
         Private Function InternalConvert(Input As Input, ByRef Output As Output) As Boolean
@@ -65,7 +65,7 @@ Namespace Machinery.Objects
             If ConvertDelegate IsNot Nothing Then Return ConvertDelegate(Input, Output) Else Return False
         End Function
         Sub New()
-            _Converter = New Core.SyncConverter(Of Input, Output)
+            _Converter = New Core.AsyncConverter(Of Input, Output)
             _Converter.Convert = AddressOf InternalConvert
         End Sub
         Sub New(Convert As Core.Converter(Of Input, Output).ConvertDelegate)
@@ -74,7 +74,7 @@ Namespace Machinery.Objects
         End Sub
         Sub New(Updater As Updaters.IUpdater)
             MyBase.New(Updater)
-            _Converter = New Core.SyncConverter(Of Input, Output)
+            _Converter = New Core.AsyncConverter(Of Input, Output)
             _Converter.Convert = AddressOf InternalConvert
         End Sub
         Sub New(Updater As Updaters.IUpdater, Convert As Core.Converter(Of Input, Output).ConvertDelegate)

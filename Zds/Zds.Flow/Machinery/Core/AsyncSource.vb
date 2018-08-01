@@ -3,8 +3,8 @@
 Namespace Machinery.Core
     Public Class AsyncSource(Of Output)
         Inherits Source(Of Output)
+        Private ReadOnly Values As New DynamicRound(Of Output)
         Private Threads As Integer = 0
-        Private Values As New DynamicRound(Of Output)
         Public Property InternalQueueSize As Integer
             Get
                 Return Values.AverageSize
