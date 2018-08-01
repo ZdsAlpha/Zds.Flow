@@ -18,6 +18,7 @@ Public Module Main
         Updatable.DefaultUpdater.ExceptionHandler = consoleLogger
         sc.ExceptionHandler = consoleLogger
         AddHandler sc.OnFinishedFrame, Sub() frames += 1
+        sc.FramesPerSecond = 30
         sc.Start()
     End Sub
     Public Sub FPSUpdater()
@@ -26,8 +27,16 @@ Public Module Main
     End Sub
 End Module
 Public Class ScreenCapture
-    Inherits Machinery
+    Inherits Systems.Machinery
     Public Property Directory As String = "Images\"
+    Public Property FramesPerSecond As Double
+        Get
+            Return 1 / Generator.Delay.TotalSeconds
+        End Get
+        Set(value As Double)
+            Generator.Delay = TimeSpan.FromSeconds(1 / value)
+        End Set
+    End Property
     Private Generator As New Timers.AsyncSource(Of Tuple(Of Bitmap, DateTime))(AddressOf Generate) With {.Delay = TimeSpan.FromSeconds(0.1)}
     Private Processor As New AsyncConverter(Of Tuple(Of Bitmap, DateTime), Tuple(Of Byte(), DateTime))(AddressOf Process) With {.MustConvert = True}
     Private Flusher As New SyncSink(Of Tuple(Of Byte(), DateTime))(AddressOf Flush)
