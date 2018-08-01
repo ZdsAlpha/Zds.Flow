@@ -1,7 +1,7 @@
 ﻿Imports Zds.Flow.Updatables
 
 Namespace Machinery.Objects
-    Public Class ASyncConverter(Of Input, Output)
+    Public Class AsyncConverter(Of Input, Output)
         Inherits AsyncObject
         Implements IConverter(Of Input, Output)
         Private _Converter As Core.AsyncConverter(Of Input, Output)

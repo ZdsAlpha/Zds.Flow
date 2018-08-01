@@ -5,7 +5,7 @@ Namespace Machinery.Timers
         Inherits SyncTimer
         Implements IConverter(Of Input, Output)
         Private _Converter As Core.SyncConverter(Of Input, Output)
-        Public Property ConvertDelegate As Core.SyncConverter(Of Input, Output).ConvertDelegate
+        Public Property ConvertDelegate As Core.Converter(Of Input, Output).ConvertDelegate
         Public Property Dropping As Boolean
             Get
                 Return _Converter.Dropping
@@ -68,7 +68,7 @@ Namespace Machinery.Timers
             _Converter = New Core.SyncConverter(Of Input, Output)
             _Converter.Convert = AddressOf InternalConvert
         End Sub
-        Sub New(Convert As Core.SyncConverter(Of Input, Output).ConvertDelegate)
+        Sub New(Convert As Core.Converter(Of Input, Output).ConvertDelegate)
             Me.New()
             ConvertDelegate = Convert
         End Sub
@@ -77,7 +77,7 @@ Namespace Machinery.Timers
             _Converter = New Core.SyncConverter(Of Input, Output)
             _Converter.Convert = AddressOf InternalConvert
         End Sub
-        Sub New(Updater As Updaters.IUpdater, Convert As Core.SyncConverter(Of Input, Output).ConvertDelegate)
+        Sub New(Updater As Updaters.IUpdater, Convert As Core.Converter(Of Input, Output).ConvertDelegate)
             Me.New(Updater)
             ConvertDelegate = Convert
         End Sub

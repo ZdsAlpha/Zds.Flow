@@ -5,7 +5,7 @@ Namespace Machinery.Timers
         Inherits SyncTimer
         Implements ISink(Of Input)
         Private _Sink As Core.SyncSink(Of Input)
-        Public Property SinkDelegate As Core.SyncSink(Of Input).SinkDelegate
+        Public Property SinkDelegate As Core.Sink(Of Input).SinkDelegate
         Public Property Recursive As Boolean
             Get
                 Return _Sink.Recursive
@@ -44,7 +44,7 @@ Namespace Machinery.Timers
             _Sink = New Core.SyncSink(Of Input)
             _Sink.Sink = AddressOf InternalSink
         End Sub
-        Sub New(Sink As Core.SyncSink(Of Input).SinkDelegate)
+        Sub New(Sink As Core.Sink(Of Input).SinkDelegate)
             Me.New()
             SinkDelegate = Sink
         End Sub
@@ -53,7 +53,7 @@ Namespace Machinery.Timers
             _Sink = New Core.SyncSink(Of Input)
             _Sink.Sink = AddressOf InternalSink
         End Sub
-        Sub New(Updater As Updaters.Updater, Sink As Core.SyncSink(Of Input).SinkDelegate)
+        Sub New(Updater As Updaters.Updater, Sink As Core.Sink(Of Input).SinkDelegate)
             MyBase.New(Updater)
             SinkDelegate = Sink
         End Sub

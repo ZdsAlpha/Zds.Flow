@@ -28,8 +28,8 @@ End Module
 Public Class ScreenCapture
     Inherits Machinery
     Public Property Directory As String = "Images\"
-    Private Generator As New SyncSource(Of Tuple(Of Bitmap, DateTime))(AddressOf Generate)
-    Private Processor As New SyncConverter(Of Tuple(Of Bitmap, DateTime), Tuple(Of Byte(), DateTime))(AddressOf Process) With {.MustConvert = True}
+    Private Generator As New AsyncSource(Of Tuple(Of Bitmap, DateTime))(AddressOf Generate)
+    Private Processor As New AsyncConverter(Of Tuple(Of Bitmap, DateTime), Tuple(Of Byte(), DateTime))(AddressOf Process) With {.MustConvert = True}
     Private Flusher As New SyncSink(Of Tuple(Of Byte(), DateTime))(AddressOf Flush)
     Public Event OnFinishedFrame()
     Private Function Generate(ByRef output As Tuple(Of Bitmap, DateTime)) As Boolean

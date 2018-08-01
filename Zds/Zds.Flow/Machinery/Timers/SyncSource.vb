@@ -5,7 +5,7 @@ Namespace Machinery.Timers
         Inherits SyncTimer
         Implements ISource(Of Output)
         Private _Source As Core.SyncSource(Of Output)
-        Public Property GenerateDelegate As Core.SyncSource(Of Output).GenerateDelegate
+        Public Property GenerateDelegate As Core.Source(Of Output).GenerateDelegate
         Public Property Dropping As Boolean
             Get
                 Return _Source.Dropping
@@ -41,7 +41,7 @@ Namespace Machinery.Timers
             _Source = New Core.SyncSource(Of Output)
             _Source.Generate = AddressOf InternalGenerate
         End Sub
-        Sub New(Generate As Core.SyncSource(Of Output).GenerateDelegate)
+        Sub New(Generate As Core.Source(Of Output).GenerateDelegate)
             Me.New()
             GenerateDelegate = Generate
         End Sub
@@ -50,7 +50,7 @@ Namespace Machinery.Timers
             _Source = New Core.SyncSource(Of Output)
             _Source.Generate = AddressOf InternalGenerate
         End Sub
-        Sub New(Updater As Updaters.IUpdater, Generate As Core.SyncSource(Of Output).GenerateDelegate)
+        Sub New(Updater As Updaters.IUpdater, Generate As Core.Source(Of Output).GenerateDelegate)
             Me.New(Updater)
             GenerateDelegate = Generate
         End Sub
