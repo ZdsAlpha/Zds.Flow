@@ -1,4 +1,5 @@
 ﻿Namespace Collections
+    <DebuggerStepThrough>
     Public Class Round(Of T)
         Implements IQueue(Of T), IStack(Of T), IStream(Of T), Interfaces.IInput(Of T), Interfaces.IOutput(Of T)
         Protected _Lock As New Object

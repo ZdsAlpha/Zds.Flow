@@ -1,4 +1,5 @@
 ﻿Namespace Collections
+    <DebuggerStepThrough>
     Public Class SafeList(Of T)
         Private List As New List(Of T)
         Public ReadOnly Property Elements As T() = New T(-1) {}

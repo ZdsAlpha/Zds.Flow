@@ -1,4 +1,5 @@
 ﻿Namespace ExceptionHandlers
+    <DebuggerStepThrough>
     Public Class ConsoleLogger
         Inherits ExceptionHandler
         Public Overrides Sub [Catch](Sender As Object, Exception As Exception)

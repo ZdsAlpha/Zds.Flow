@@ -20,6 +20,12 @@ Public Module Main
         AddHandler sc.OnFinishedFrame, Sub() frames += 1
         sc.FramesPerSecond = 30
         sc.Start()
+        Threading.Thread.Sleep(10000)
+        sc.Stop()
+        Threading.Thread.Sleep(5000)
+        sc.Destroy()
+        Threading.Thread.Sleep(5000)
+        Stop
     End Sub
     Public Sub FPSUpdater()
         Console.Title = frames.ToString + " fps"
@@ -72,16 +78,16 @@ Public Class ScreenCapture
         MyBase.Start()
         If IsRunning Then
             Generator.Start()
-            Processor.Start()
-            Flusher.Start()
+            'Processor.Start()
+            'Flusher.Start()
         End If
     End Sub
     Public Overrides Sub [Stop]()
         MyBase.Stop()
         If Not IsRunning Then
             Generator.Stop()
-            Processor.Stop()
-            Flusher.Stop()
+            'Processor.Stop()
+            'Flusher.Stop()
         End If
     End Sub
     Sub New()
@@ -90,5 +96,7 @@ Public Class ScreenCapture
         Add(Flusher)
         Generator.Sink = Processor
         Processor.Sink = Flusher
+        Processor.Start()
+        Flusher.Start()
     End Sub
 End Class

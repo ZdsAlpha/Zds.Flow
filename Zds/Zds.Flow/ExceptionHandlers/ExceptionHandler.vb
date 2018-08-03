@@ -1,4 +1,5 @@
 ﻿Namespace ExceptionHandlers
+    <DebuggerStepThrough>
     Public Class ExceptionHandler
         Implements IExceptionHandler
         Public Event OnException(Sender As Object, Exception As Exception)

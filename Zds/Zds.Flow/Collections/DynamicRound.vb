@@ -1,4 +1,5 @@
 ﻿Namespace Collections
+    <DebuggerStepThrough>
     Public Class DynamicRound(Of T)
         Inherits Round(Of T)
         Public Resizes As Integer = 0
