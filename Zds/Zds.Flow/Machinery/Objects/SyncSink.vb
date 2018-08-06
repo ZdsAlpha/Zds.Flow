@@ -54,7 +54,7 @@ Namespace Machinery.Objects
             _Sink.Sink = AddressOf InternalSink
         End Sub
         Sub New(Updater As Updaters.IUpdater, Sink As Core.Sink(Of Input).SinkDelegate)
-            MyBase.New(Updater)
+            Me.New(Updater)
             SinkDelegate = Sink
         End Sub
     End Class
