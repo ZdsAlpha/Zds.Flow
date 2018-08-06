@@ -48,12 +48,12 @@ Namespace Machinery.Objects
             Me.New()
             SinkDelegate = Sink
         End Sub
-        Sub New(Updater As Updaters.Updater)
+        Sub New(Updater As Updaters.IUpdater)
             MyBase.New(Updater)
             _Sink = New Core.SyncSink(Of Input)
             _Sink.Sink = AddressOf InternalSink
         End Sub
-        Sub New(Updater As Updaters.Updater, Sink As Core.Sink(Of Input).SinkDelegate)
+        Sub New(Updater As Updaters.IUpdater, Sink As Core.Sink(Of Input).SinkDelegate)
             MyBase.New(Updater)
             SinkDelegate = Sink
         End Sub

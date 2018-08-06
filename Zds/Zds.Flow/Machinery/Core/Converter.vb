@@ -1,8 +1,10 @@
 ﻿Imports Zds.Flow.Collections
+Imports Zds.Flow.Interfaces
 
 Namespace Machinery.Core
     Public MustInherit Class Converter(Of Input, Output)
         Implements IConverter(Of Input, Output)
+        Public ReadOnly Property IsDestroyed As Boolean Implements IDestroyable.IsDestroyed
         Public Property Sink As ISink(Of Output) Implements ISource(Of Output).Sink
         Public Property Convert As ConvertDelegate
         Public Property Queue As IQueue(Of Input)
@@ -14,6 +16,9 @@ Namespace Machinery.Core
             Return Queue.Enqueue(obj)
         End Function
         Public MustOverride Sub Activate() Implements IConverter(Of Input, Output).Activate
+        Public Sub Destroy() Implements IDestroyable.Destroy
+
+        End Sub
         Sub New()
             Queue = New Round(Of Input)()
         End Sub

@@ -20,12 +20,6 @@ Public Module Main
         AddHandler sc.OnFinishedFrame, Sub() frames += 1
         sc.FramesPerSecond = 30
         sc.Start()
-        Threading.Thread.Sleep(10000)
-        sc.Stop()
-        Threading.Thread.Sleep(5000)
-        sc.Destroy()
-        Threading.Thread.Sleep(5000)
-        Stop
     End Sub
     Public Sub FPSUpdater()
         Console.Title = frames.ToString + " fps"
@@ -43,11 +37,11 @@ Public Class ScreenCapture
             Generator.Delay = TimeSpan.FromSeconds(1 / value)
         End Set
     End Property
-    Private Generator As New Timers.AsyncSource(Of Tuple(Of Bitmap, DateTime))(AddressOf Generate) With {.Delay = TimeSpan.FromSeconds(0.1)}
-    Private Processor As New AsyncConverter(Of Tuple(Of Bitmap, DateTime), Tuple(Of Byte(), DateTime))(AddressOf Process) With {.MustConvert = True}
-    Private Flusher As New SyncSink(Of Tuple(Of Byte(), DateTime))(AddressOf Flush)
+    Private Generator As New Timers.AsyncSource(Of Tuple(Of Bitmap, Integer))(Me, AddressOf Generate) With {.Delay = TimeSpan.FromSeconds(0.1)}
+    Private Processor As New AsyncConverter(Of Tuple(Of Bitmap, Integer), Tuple(Of Byte(), Integer))(Me, AddressOf Process) With {.MustConvert = True}
+    Private Flusher As New SyncSink(Of Tuple(Of Byte(), Integer))(Me, AddressOf Flush)
     Public Event OnFinishedFrame()
-    Private Function Generate(ByRef output As Tuple(Of Bitmap, DateTime)) As Boolean
+    Private Function Generate(ByRef output As Tuple(Of Bitmap, Integer)) As Boolean
         Dim time As DateTime
         Dim screens = Windows.Forms.Screen.AllScreens
         Dim bounds = screens(0).Bounds
@@ -56,20 +50,20 @@ Public Class ScreenCapture
             time = DateTime.Now
             g.CopyFromScreen(bounds.Left, bounds.Top, 0, 0, bounds.Size)
         End Using
-        output = New Tuple(Of Bitmap, DateTime)(shot, time)
+        output = New Tuple(Of Bitmap, Integer)(shot, time)
         Return True
     End Function
-    Private Function Process(input As Tuple(Of Bitmap, DateTime), ByRef output As Tuple(Of Byte(), DateTime)) As Boolean
+    Private Function Process(input As Tuple(Of Bitmap, Integer), ByRef output As Tuple(Of Byte(), Integer)) As Boolean
         Dim bytes As Byte() = Nothing
         Using stream As New IO.MemoryStream()
             input.Item1.Save(stream, Imaging.ImageFormat.Jpeg)
             bytes = stream.ToArray
         End Using
-        output = New Tuple(Of Byte(), DateTime)(bytes, input.Item2)
+        output = New Tuple(Of Byte(), Integer)(bytes, input.Item2)
         input.Item1.Dispose()
         Return True
     End Function
-    Private Function Flush(input As Tuple(Of Byte(), DateTime)) As Boolean
+    Private Function Flush(input As Tuple(Of Byte(), Integer)) As Boolean
         IO.File.WriteAllBytes(Directory + input.Item2.ToString("yyyy-MM-dd HH:mm:ss.fff").Replace("/", "_").Replace("\", "_").Replace(":", "_") + ".jpg", input.Item1)
         RaiseEvent OnFinishedFrame()
         Return True

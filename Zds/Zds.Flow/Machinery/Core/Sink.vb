@@ -1,8 +1,10 @@
 ﻿Imports Zds.Flow.Collections
+Imports Zds.Flow.Interfaces
 
 Namespace Machinery.Core
     Public MustInherit Class Sink(Of Input)
         Implements ISink(Of Input)
+        Public ReadOnly Property IsDestroyed As Boolean Implements IDestroyable.IsDestroyed
         Public Property Sink As SinkDelegate
         Public Property Queue As IQueue(Of Input)
         Public Property Recursive As Boolean = True
@@ -11,6 +13,9 @@ Namespace Machinery.Core
             Return Queue.Enqueue(obj)
         End Function
         Public MustOverride Sub Activate() Implements ISink(Of Input).Activate
+        Public Sub Destroy() Implements IDestroyable.Destroy
+
+        End Sub
         Sub New()
             Queue = New Round(Of Input)()
         End Sub
