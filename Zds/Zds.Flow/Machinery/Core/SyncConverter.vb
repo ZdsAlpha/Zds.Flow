@@ -8,10 +8,12 @@ Namespace Machinery.Core
         Private HasConverted As Boolean
         Private Converted As Output
         Public Overrides Sub Activate()
+            If IsDestroyed Then Exit Sub
             Dim _Sink = Sink
             Dim _Queue = Queue
             If _Queue IsNot Nothing AndAlso Not HasValue Then HasValue = _Queue.Dequeue(Value)
             Do
+                If IsDestroyed Then Exit Do
                 'Sinking converted value
                 If HasConverted Then
                     If (_Sink IsNot Nothing AndAlso _Sink.Receive(Converted)) OrElse Dropping Then
@@ -31,8 +33,17 @@ Namespace Machinery.Core
                 Else
                     Exit Do
                 End If
-                If _Queue IsNot Nothing Then HasValue = _Queue.Dequeue(Value)
+                If _Queue IsNot Nothing AndAlso Not IsDestroyed Then HasValue = _Queue.Dequeue(Value)
             Loop While Recursive
+        End Sub
+        Public Overrides Sub Destroy()
+            MyBase.Destroy()
+            HasValue = False
+            Discard(Value)
+            Value = Nothing
+            HasConverted = False
+            Discard(Converted)
+            Converted = Nothing
         End Sub
         Sub New()
             MyBase.New()
