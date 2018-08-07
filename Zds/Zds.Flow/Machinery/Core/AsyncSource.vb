@@ -22,8 +22,8 @@ Namespace Machinery.Core
             If Values.Length + Threads < InternalQueueSize Then HasValue = Generate(Value)
             If Not HasValue Then HasValue = Values.Dequeue(Value)
             If HasValue Then
-                If _Sink IsNot Nothing AndAlso _Sink.Receive(Value) Then
-                ElseIf Dropping Then
+                If _Sink IsNot Nothing AndAlso Not IsDestroyed AndAlso _Sink.Receive(Value) Then
+                ElseIf Dropping OrElse IsDestroyed Then
                     Discard(Value)
                 Else
                     Values.Enqueue(Value)
@@ -33,11 +33,7 @@ Namespace Machinery.Core
         End Sub
         Public Overrides Sub Destroy()
             MyBase.Destroy()
-            Dim Array = Values.ToArray
-            Values.Clear()
-            For Each Obj In Array
-                Discard(Obj)
-            Next
+            Destroy(Values)
         End Sub
         Sub New()
             MyBase.New()

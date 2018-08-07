@@ -6,18 +6,20 @@ Namespace Machinery.Core
         Private HasValue As Boolean
         Private Value As Input
         Public Overrides Sub Activate()
-            If IsDestroyed Then Exit Sub
-            Dim _Queue = Queue
-            If _Queue IsNot Nothing AndAlso Not HasValue Then HasValue = _Queue.Dequeue(Value)
             Do
                 If IsDestroyed Then Exit Do
+                Dim _Queue = Queue
+                If _Queue IsNot Nothing AndAlso Not HasValue Then HasValue = _Queue.Dequeue(Value)
                 If HasValue AndAlso Sink(Value) Then
+                    HasValue = False
+                    Value = Nothing
+                ElseIf IsDestroyed Then
+                    Discard(Value)
                     HasValue = False
                     Value = Nothing
                 Else
                     Exit Do
                 End If
-                If _Queue IsNot Nothing AndAlso Not IsDestroyed Then HasValue = _Queue.Dequeue(Value)
             Loop While Recursive
         End Sub
         Public Overrides Sub Destroy()

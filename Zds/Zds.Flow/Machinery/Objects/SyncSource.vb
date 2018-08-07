@@ -27,6 +27,7 @@ Namespace Machinery.Objects
             _Source.Activate()
         End Sub
         Private Function InternalGenerate(ByRef Output As Output) As Boolean
+            If IsDestroyed Then Return False
             Try
                 Return Generate(Output)
             Catch ex As Exception
@@ -37,6 +38,10 @@ Namespace Machinery.Objects
         Protected Overridable Function Generate(ByRef Output As Output) As Boolean
             If GenerateDelegate IsNot Nothing Then Return GenerateDelegate(Output) Else Return False
         End Function
+        Public Overrides Sub Destroy()
+            MyBase.Destroy()
+            _Source.Destroy()
+        End Sub
         Sub New()
             _Source = New Core.SyncSource(Of Output)
             _Source.Generate = AddressOf InternalGenerate

@@ -47,6 +47,7 @@ Namespace Machinery.Objects
             End Set
         End Property
         Public Function Receive(obj As Input) As Boolean Implements ISink(Of Input).Receive
+            If IsDestroyed Then Return False
             Return _Converter.Receive(obj)
         End Function
         Protected Overrides Sub SyncUpdate()
@@ -54,6 +55,7 @@ Namespace Machinery.Objects
             _Converter.Activate()
         End Sub
         Private Function InternalConvert(Input As Input, ByRef Output As Output) As Boolean
+            If IsDestroyed Then Return False
             Try
                 Return Convert(Input, Output)
             Catch ex As Exception
@@ -61,9 +63,13 @@ Namespace Machinery.Objects
                 Return False
             End Try
         End Function
-        Protected Function Convert(Input As Input, ByRef Output As Output) As Boolean
+        Protected Overridable Function Convert(Input As Input, ByRef Output As Output) As Boolean
             If ConvertDelegate IsNot Nothing Then Return ConvertDelegate(Input, Output) Else Return False
         End Function
+        Public Overrides Sub Destroy()
+            MyBase.Destroy()
+            _Converter.Destroy()
+        End Sub
         Sub New()
             _Converter = New Core.SyncConverter(Of Input, Output)
             _Converter.Convert = AddressOf InternalConvert

@@ -23,7 +23,23 @@ Public Module Main
         AddHandler sc.OnFinishedFrame, Sub() Threading.Interlocked.Increment(frames)
         sc.FramesPerSecond = 15
         sc.Start()
+        Threading.Thread.Sleep(10000)
+        sc.Destroy()
+        Threading.Thread.Sleep(5000)
+        Dim x = _Bitmap.List.Elements
+        Dim y = _Bitmap.GetLeakedBitmaps
+        Dim a = _Buffer.List.Elements
+        Dim b = _Buffer.GetLeakedBuffers
+        Dim xyz = Collections.Round.AllRounds
+        Stop
     End Sub
+    Public Function Extract(Machine As IContainer) As Object()
+        Dim List As New List(Of Object)
+        For Each obj In Machine.Targets
+
+        Next
+        Return List.ToArray
+    End Function
     Public Sub FPSUpdater()
         Console.Title = frames.ToString + " fps"
         frames = 0
@@ -53,15 +69,15 @@ Public Class ScreenCapture
         End Set
     End Property
 
-    Private Generator As New Timers.AsyncSource(Of Tuple(Of Bitmap, Integer))(Me, AddressOf Generate) With {.Delay = TimeSpan.FromSeconds(0.1)}
-    Private Processor As New AsyncConverter(Of Tuple(Of Bitmap, Integer), Tuple(Of Byte(), Integer))(Me, AddressOf Process) With {.MustConvert = True}
-    Private Flusher As New SyncSink(Of Tuple(Of Byte(), Integer))(Me, AddressOf Flush)
+    Private Generator As New Timers.AsyncSource(Of Tuple(Of _Bitmap, Integer))(Me, AddressOf Generate) With {.Delay = TimeSpan.FromSeconds(0.1)}
+    Private Processor As New AsyncConverter(Of Tuple(Of _Bitmap, Integer), Tuple(Of _Buffer, Integer))(Me, AddressOf Process) With {.MustConvert = True}
+    Private Flusher As New SyncSink(Of Tuple(Of _Buffer, Integer))(Me, AddressOf Flush)
 
     Private JpegEncoder As ImageCodecInfo = GetEncoder(ImageFormat.Jpeg)
     Private Parameters As New EncoderParameters(1)
 
     Private frameId As Long = 0
-    Private Function Generate(ByRef output As Tuple(Of Bitmap, Integer)) As Boolean
+    Private Function Generate(ByRef output As Tuple(Of _Bitmap, Integer)) As Boolean
         Dim bounds = Screen.PrimaryScreen.Bounds
         Dim shot As New Bitmap(bounds.Size.Width, bounds.Size.Height)
         Dim id As Long
@@ -76,21 +92,22 @@ Public Class ScreenCapture
                 g.ReleaseHdc()
             End If
         End Using
-        output = New Tuple(Of Bitmap, Integer)(shot, id)
+        output = New Tuple(Of _Bitmap, Integer)(New _Bitmap(shot), id)
         Return True
     End Function
-    Private Function Process(input As Tuple(Of Bitmap, Integer), ByRef output As Tuple(Of Byte(), Integer)) As Boolean
+    Private Function Process(input As Tuple(Of _Bitmap, Integer), ByRef output As Tuple(Of _Buffer, Integer)) As Boolean
         Dim bytes As Byte() = Nothing
         Using stream As New IO.MemoryStream()
-            input.Item1.Save(stream, JpegEncoder, Parameters)
+            input.Item1.Bitmap.Save(stream, JpegEncoder, Parameters)
             bytes = stream.ToArray
         End Using
-        output = New Tuple(Of Byte(), Integer)(bytes, input.Item2)
+        output = New Tuple(Of _Buffer, Integer)(New _Buffer(bytes), input.Item2)
         input.Item1.Dispose()
         Return True
     End Function
-    Private Function Flush(input As Tuple(Of Byte(), Integer)) As Boolean
-        IO.File.WriteAllBytes(Directory + input.Item2.ToString("D6") + ".jpg", input.Item1)
+    Private Function Flush(input As Tuple(Of _Buffer, Integer)) As Boolean
+        IO.File.WriteAllBytes(Directory + input.Item2.ToString("D6") + ".jpg", input.Item1.Data)
+        input.Item1.Dispose()
         RaiseEvent OnFinishedFrame(input.Item2)
         Return True
     End Function
@@ -174,4 +191,44 @@ Public Class ScreenCapture
         Catch
         End Try
     End Sub
+End Class
+Public Class _Bitmap
+    Implements IDisposable
+    Private Shared UId As Long
+    Public Shared ReadOnly Property List As New Collections.SafeList(Of _Bitmap)
+    Public ReadOnly Property IsDispsoed As Boolean
+    Public ReadOnly Property Bitmap As Bitmap
+    Public ReadOnly Property Id As Long
+    Public Sub Dispose() Implements IDisposable.Dispose
+        _IsDispsoed = True
+        Bitmap.Dispose()
+    End Sub
+    Sub New(Bitmap As Bitmap)
+        List.Add(Me)
+        Id = Threading.Interlocked.Increment(UId)
+        Me.Bitmap = Bitmap
+    End Sub
+    Public Shared Function GetLeakedBitmaps() As _Bitmap()
+        Return List.Elements.Where(Function(x) Not x.IsDispsoed).ToArray()
+    End Function
+End Class
+Public Class _Buffer
+    Implements IDisposable
+    Private Shared UId As Long
+    Public Shared ReadOnly Property List As New Collections.SafeList(Of _Buffer)
+    Public ReadOnly Property IsDispsoed As Boolean
+    Public ReadOnly Property Data As Byte()
+    Public ReadOnly Property Id As Long
+    Public Sub Dispose() Implements IDisposable.Dispose
+        _IsDispsoed = True
+        _Data = Nothing
+    End Sub
+    Sub New(Data As Byte())
+        List.Add(Me)
+        Id = Threading.Interlocked.Increment(UId)
+        Me.Data = Data
+    End Sub
+    Public Shared Function GetLeakedBuffers() As _Buffer()
+        Return List.Elements.Where(Function(x) Not x.IsDispsoed).ToArray()
+    End Function
 End Class

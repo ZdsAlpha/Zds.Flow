@@ -1,4 +1,7 @@
 ﻿Namespace Collections
+    Public Class Round
+        Public Shared ReadOnly Property AllRounds As New SafeList(Of Object)
+    End Class
     <DebuggerStepThrough>
     Public Class Round(Of T)
         Implements IQueue(Of T), IStack(Of T), IStream(Of T), Interfaces.IInput(Of T), Interfaces.IOutput(Of T)
@@ -6,20 +9,15 @@
         Protected _Buffer As T()
         Protected _Position As Integer
         Protected _Length As Integer
+        Public ReadOnly Property Lock As Object
+            Get
+                Return _Lock
+            End Get
+        End Property
         Public ReadOnly Property Length As Integer
             Get
                 Return _Length
             End Get
-        End Property
-        Default Public Property Element(Index As Integer) As T
-            Get
-                If Index >= Length Then Throw New IndexOutOfRangeException()
-                Return _Buffer((_Position + Index) Mod Size)
-            End Get
-            Set(value As T)
-                If Index >= Length Then Throw New IndexOutOfRangeException()
-                _Buffer((_Position + Index) Mod Size) = value
-            End Set
         End Property
         Public ReadOnly Property Size As Integer
             Get
@@ -108,6 +106,11 @@
         Public Function AddLast(Elements As T(), Optional Overwrite As Boolean = False) As Integer
             Return AddLast(Elements, Overwrite)
         End Function
+        Public Function ElementAt(Index As Integer, ByRef Element As T) As Boolean
+            SyncLock _Lock
+                Return _ElementAt(Index, Element)
+            End SyncLock
+        End Function
 
         'Stream
         Public Function Write(Elements As T(), Start As Integer, Length As Integer) As Integer Implements IStream(Of T).Write
@@ -147,7 +150,7 @@
 
         'Others
         Public Sub Clear()
-            SetLength(0)
+            RemoveLast(Integer.MaxValue)
         End Sub
         Public Function ToArray() As T()
             SyncLock _Lock
@@ -162,6 +165,7 @@
             Me.New(DefaultSize)
         End Sub
         Sub New(Size As Integer)
+            Round.AllRounds.Add(Me)
             _Buffer = New T(Size - 1) {}
         End Sub
 
@@ -299,6 +303,11 @@
             End If
             Length = _AddLast(Length)
             Return _CopyFrom(Elements, Start, _Length - Length, Length)
+        End Function
+        Protected Function _ElementAt(Index As Integer, ByRef Element As T) As Boolean
+            If Index < 0 Or Index >= _Length Then Return False
+            Element = _Buffer((_Position + +Index) Mod Size)
+            Return True
         End Function
 
         'Shared Methods

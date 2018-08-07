@@ -20,14 +20,10 @@ Namespace Machinery.Core
             If IsDestroyed Then Exit Sub
             MyBase.Destroy()
             Dim _Queue = Queue
-            _Queue = Nothing
+            Queue = Nothing
             Dim Round As Round(Of Input) = TryCast(_Queue, Round(Of Input))
             If Round IsNot Nothing Then
-                Dim Array = Round.ToArray()
-                Round.Clear()
-                For Each obj In Array
-                    Discard(obj)
-                Next
+                Destroy(Round)
             Else
                 Discard(_Queue)
             End If

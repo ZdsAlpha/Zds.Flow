@@ -23,6 +23,7 @@ Namespace Machinery.Objects
             End Set
         End Property
         Public Function Receive(obj As Input) As Boolean Implements ISink(Of Input).Receive
+            If IsDestroyed Then Return False
             Return _Sink.Receive(obj)
         End Function
         Protected Overrides Sub AsyncUpdate()
@@ -30,6 +31,7 @@ Namespace Machinery.Objects
             _Sink.Activate()
         End Sub
         Private Function InternalSink(Input As Input) As Boolean
+            If IsDestroyed Then Return False
             Try
                 Return Sink(Input)
             Catch ex As Exception
@@ -40,6 +42,10 @@ Namespace Machinery.Objects
         Protected Overridable Function Sink(Input As Input) As Boolean
             If SinkDelegate IsNot Nothing Then Return SinkDelegate(Input) Else Return False
         End Function
+        Public Overrides Sub Destroy()
+            MyBase.Destroy()
+            _Sink.Destroy()
+        End Sub
         Sub New()
             _Sink = New Core.AsyncSink(Of Input)
             _Sink.Sink = AddressOf InternalSink

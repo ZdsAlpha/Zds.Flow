@@ -2,7 +2,6 @@
     <DebuggerStepThrough>
     Public Class DynamicRound(Of T)
         Inherits Round(Of T)
-        Public Resizes As Integer = 0
         Private _GrowthFactor As Single
         Private _MinSize As Integer = 1
         Private _AverageSize As Integer = DefaultSize
@@ -47,7 +46,6 @@
         End Property
 
         Public Overrides Function SetSize(Size As Integer, Optional Forced As Boolean = True) As Boolean
-            Resizes += 1
             If Size < MinSize Then Size = MinSize
             Return MyBase.SetSize(Size, Forced)
         End Function

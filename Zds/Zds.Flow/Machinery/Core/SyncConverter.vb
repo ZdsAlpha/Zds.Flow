@@ -8,38 +8,38 @@ Namespace Machinery.Core
         Private HasConverted As Boolean
         Private Converted As Output
         Public Overrides Sub Activate()
-            If IsDestroyed Then Exit Sub
-            Dim _Sink = Sink
-            Dim _Queue = Queue
-            If _Queue IsNot Nothing AndAlso Not HasValue Then HasValue = _Queue.Dequeue(Value)
             Do
-                If IsDestroyed Then Exit Do
-                'Sinking converted value
-                If HasConverted Then
-                    If _Sink IsNot Nothing AndAlso _Sink.Receive(Converted) Then
-                        HasConverted = False
-                        Converted = Nothing
-                    ElseIf Dropping Then
-                        Discard(Converted)
-                        HasConverted = False
-                        Converted = Nothing
-                    End If
-                End If
-                'Converting input value
+                If IsDestroyed Then Exit Sub
+                Dim _Sink = Sink
+                Dim _Queue = Queue
+                If _Queue IsNot Nothing AndAlso Not HasValue Then HasValue = _Queue.Dequeue(Value)
+                'Converting value
                 If HasValue And Not HasConverted Then
                     If Convert(Value, Converted) Then
                         HasConverted = True
-                    ElseIf MustConvert Then
+                    ElseIf MustConvert And Not IsDestroyed Then
                         Exit Do
                     Else
                         Discard(Value)
                     End If
                     HasValue = False
                     Value = Nothing
+                End If
+                'Sinking converted value
+                If HasConverted Then
+                    If _Sink IsNot Nothing AndAlso Not IsDestroyed AndAlso _Sink.Receive(Converted) Then
+                        HasConverted = False
+                        Converted = Nothing
+                    ElseIf Dropping OrElse IsDestroyed Then
+                        Discard(Converted)
+                        HasConverted = False
+                        Converted = Nothing
+                    Else
+                        Exit Do
+                    End If
                 Else
                     Exit Do
                 End If
-                If _Queue IsNot Nothing AndAlso Not IsDestroyed Then HasValue = _Queue.Dequeue(Value)
             Loop While Recursive
         End Sub
         Public Overrides Sub Destroy()

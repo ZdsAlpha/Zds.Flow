@@ -8,10 +8,10 @@
             Dim _Sink = Sink
             If Not HasValue Then HasValue = Generate(Value)
             If HasValue Then
-                If _Sink IsNot Nothing AndAlso _Sink.Receive(Value) Then
+                If _Sink IsNot Nothing AndAlso Not IsDestroyed AndAlso _Sink.Receive(Value) Then
                     HasValue = False
                     Value = Nothing
-                ElseIf Dropping Then
+                ElseIf Dropping OrElse IsDestroyed Then
                     Discard(Value)
                     HasValue = False
                     Value = Nothing

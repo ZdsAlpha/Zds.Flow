@@ -16,17 +16,17 @@ Namespace Machinery.Core
         Public Overrides Sub Activate()
             If IsDestroyed Then Exit Sub
             Threading.Interlocked.Increment(Threads)
-            Dim _Queue = Queue
-            Dim Value As Input
-            Dim HasValue As Boolean = False
             Do
                 If IsDestroyed Then Exit Do
+                Dim _Queue = Queue
+                Dim Value As Input
+                Dim HasValue As Boolean = False
                 If _Queue IsNot Nothing AndAlso Values.Length + Threads < InternalQueueSize Then HasValue = _Queue.Dequeue(Value)
                 If Not HasValue Then HasValue = Values.Dequeue(Value)
                 If Not HasValue Then Exit Do
                 If Sink(Value) Then
-                    HasValue = False
-                    Value = Nothing
+                ElseIf IsDestroyed Then
+                    Discard(Value)
                 Else
                     Values.Enqueue(Value)
                     Exit Do
@@ -36,11 +36,7 @@ Namespace Machinery.Core
         End Sub
         Public Overrides Sub Destroy()
             MyBase.Destroy()
-            Dim Array = Values.ToArray
-            Values.Clear()
-            For Each Obj In Array
-                Discard(Obj)
-            Next
+            Destroy(Values)
         End Sub
         Sub New()
             MyBase.New
