@@ -14,6 +14,7 @@ Namespace Machinery.Core
             End Set
         End Property
         Public Overrides Sub Activate()
+            If IsDestroyed Then Exit Sub
             Threading.Interlocked.Increment(Threads)
             Dim _Sink = Sink
             Dim Value As Output
@@ -22,11 +23,21 @@ Namespace Machinery.Core
             If Not HasValue Then HasValue = Values.Dequeue(Value)
             If HasValue Then
                 If _Sink IsNot Nothing AndAlso _Sink.Receive(Value) Then
-                ElseIf Not Dropping Then
+                ElseIf Dropping Then
+                    Discard(Value)
+                Else
                     Values.Enqueue(Value)
                 End If
             End If
             Threading.Interlocked.Decrement(Threads)
+        End Sub
+        Public Overrides Sub Destroy()
+            MyBase.Destroy()
+            Dim Array = Values.ToArray
+            Values.Clear()
+            For Each Obj In Array
+                Discard(Obj)
+            Next
         End Sub
         Sub New()
             MyBase.New()

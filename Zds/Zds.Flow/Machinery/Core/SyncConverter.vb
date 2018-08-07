@@ -16,7 +16,11 @@ Namespace Machinery.Core
                 If IsDestroyed Then Exit Do
                 'Sinking converted value
                 If HasConverted Then
-                    If (_Sink IsNot Nothing AndAlso _Sink.Receive(Converted)) OrElse Dropping Then
+                    If _Sink IsNot Nothing AndAlso _Sink.Receive(Converted) Then
+                        HasConverted = False
+                        Converted = Nothing
+                    ElseIf Dropping Then
+                        Discard(Converted)
                         HasConverted = False
                         Converted = Nothing
                     End If
@@ -27,6 +31,8 @@ Namespace Machinery.Core
                         HasConverted = True
                     ElseIf MustConvert Then
                         Exit Do
+                    Else
+                        Discard(Value)
                     End If
                     HasValue = False
                     Value = Nothing

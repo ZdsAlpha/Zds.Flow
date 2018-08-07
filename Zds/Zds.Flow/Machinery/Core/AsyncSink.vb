@@ -14,11 +14,13 @@ Namespace Machinery.Core
             End Set
         End Property
         Public Overrides Sub Activate()
+            If IsDestroyed Then Exit Sub
             Threading.Interlocked.Increment(Threads)
             Dim _Queue = Queue
             Dim Value As Input
             Dim HasValue As Boolean = False
             Do
+                If IsDestroyed Then Exit Do
                 If _Queue IsNot Nothing AndAlso Values.Length + Threads < InternalQueueSize Then HasValue = _Queue.Dequeue(Value)
                 If Not HasValue Then HasValue = Values.Dequeue(Value)
                 If Not HasValue Then Exit Do
@@ -31,6 +33,14 @@ Namespace Machinery.Core
                 End If
             Loop While Recursive
             Threading.Interlocked.Decrement(Threads)
+        End Sub
+        Public Overrides Sub Destroy()
+            MyBase.Destroy()
+            Dim Array = Values.ToArray
+            Values.Clear()
+            For Each Obj In Array
+                Discard(Obj)
+            Next
         End Sub
         Sub New()
             MyBase.New
