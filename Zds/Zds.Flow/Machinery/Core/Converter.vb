@@ -3,8 +3,8 @@ Imports Zds.Flow.Interfaces
 
 Namespace Machinery.Core
     Public MustInherit Class Converter(Of Input, Output)
+        Inherits Base
         Implements IConverter(Of Input, Output)
-        Public ReadOnly Property IsDestroyed As Boolean Implements IDestroyable.IsDestroyed
         Public Property Sink As ISink(Of Output) Implements ISource(Of Output).Sink
         Public Property Convert As ConvertDelegate
         Public Property Queue As IQueue(Of Input)
@@ -12,12 +12,25 @@ Namespace Machinery.Core
         Public Property Recursive As Boolean = True
         Public Property MustConvert As Boolean = False
         Public Function Receive(obj As Input) As Boolean Implements ISink(Of Input).Receive
-            If Queue Is Nothing Then Return Nothing
-            Return Queue.Enqueue(obj)
+            Dim _Queue = Queue
+            If IsDestroyed OrElse _Queue Is Nothing Then Return False
+            Return _Queue.Enqueue(obj)
         End Function
-        Public MustOverride Sub Activate() Implements IConverter(Of Input, Output).Activate
-        Public Sub Destroy() Implements IDestroyable.Destroy
-
+        Public Overrides Sub Destroy() Implements IDestroyable.Destroy
+            If IsDestroyed Then Exit Sub
+            MyBase.Destroy()
+            Dim _Queue = Queue
+            _Queue = Nothing
+            Dim Round As Round(Of Input) = TryCast(_Queue, Round(Of Input))
+            If Round IsNot Nothing Then
+                Dim Array = Round.ToArray()
+                Round.Clear()
+                For Each obj In Array
+                    Discard(obj)
+                Next
+            Else
+                Discard(_Queue)
+            End If
         End Sub
         Sub New()
             Queue = New Round(Of Input)()
