@@ -3,40 +3,23 @@
 Namespace Machinery.Core
     Public Class AsyncSink(Of Input)
         Inherits Sink(Of Input)
-        Private ReadOnly Values As New DynamicRound(Of Input)
-        Private Threads As Integer = 0
-        Public Property InternalQueueSize As Integer
-            Get
-                Return Values.AverageSize
-            End Get
-            Set(value As Integer)
-                Values.AverageSize = value
-            End Set
-        End Property
+        Public ReadOnly InputsCache As New DynamicRound(Of Input)
         Public Overrides Sub Activate()
             If IsDestroyed Then Exit Sub
-            Threading.Interlocked.Increment(Threads)
             Do
                 If IsDestroyed Then Exit Do
                 Dim _Queue = Queue
                 Dim Value As Input
                 Dim HasValue As Boolean = False
-                If _Queue IsNot Nothing AndAlso Values.Length + Threads < InternalQueueSize Then HasValue = _Queue.Dequeue(Value)
-                If Not HasValue Then HasValue = Values.Dequeue(Value)
+                If _Queue IsNot Nothing AndAlso InputsCache.Length < InputsCache.AverageSize Then HasValue = _Queue.Dequeue(Value)
+                If Not HasValue Then HasValue = InputsCache.Dequeue(Value)
                 If Not HasValue Then Exit Do
                 If Sink(Value) Then
-                ElseIf IsDestroyed Then
-                    Discard(Value)
                 Else
-                    Values.Enqueue(Value)
+                    InputsCache.Enqueue(Value)
                     Exit Do
                 End If
             Loop While Recursive
-            Threading.Interlocked.Decrement(Threads)
-        End Sub
-        Public Overrides Sub Destroy()
-            MyBase.Destroy()
-            Destroy(Values)
         End Sub
         Sub New()
             MyBase.New

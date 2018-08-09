@@ -3,21 +3,10 @@
 Namespace Machinery.Core
     Public Class AsyncConverter(Of Input, Output)
         Inherits Converter(Of Input, Output)
-        Private ReadOnly Values As New DynamicRound(Of Input)
-        Private ReadOnly Converted As New DynamicRound(Of Output)
-        Private Threads As Integer = 0
-        Public Property InternalQueueSize As Integer
-            Get
-                Return Values.AverageSize
-            End Get
-            Set(value As Integer)
-                Values.AverageSize = value
-                Converted.AverageSize = value
-            End Set
-        End Property
+        Public ReadOnly InputsCache As New DynamicRound(Of Input)
+        Public ReadOnly OutputsCache As New DynamicRound(Of Output)
         Public Overrides Sub Activate()
             If IsDestroyed Then Exit Sub
-            Threading.Interlocked.Increment(Threads)
             Dim Worked As Boolean = False
             Do
                 If IsDestroyed Then Exit Do
@@ -28,36 +17,26 @@ Namespace Machinery.Core
                 Dim Converted As Output
                 Dim HasConverted As Boolean = False
                 Worked = False
-                If _Queue IsNot Nothing AndAlso Values.Length + Threads < InternalQueueSize Then HasValue = _Queue.Dequeue(Value)
-                If Not HasValue AndAlso Me.Converted.Length + Threads < InternalQueueSize Then HasValue = Values.Dequeue(Value)
-                If Not HasValue Then HasConverted = Me.Converted.Dequeue(Converted)
+                If _Queue IsNot Nothing AndAlso InputsCache.Length < InputsCache.AverageSize Then HasValue = _Queue.Dequeue(Value)
+                If Not HasValue AndAlso OutputsCache.Length < OutputsCache.AverageSize Then HasValue = InputsCache.Dequeue(Value)
+                If Not HasValue Then HasConverted = OutputsCache.Dequeue(Converted)
                 If Not HasValue And Not HasConverted Then Exit Do
                 If HasValue Then
                     If Convert(Value, Converted) Then
                         HasConverted = True
                         Worked = True
-                    ElseIf MustConvert And Not IsDestroyed Then
-                        Values.Enqueue(Value)
-                    Else
-                        Discard(Value)
+                    ElseIf MustConvert Then
+                        InputsCache.Enqueue(Value)
                     End If
                 End If
                 If HasConverted Then
-                    If _Sink IsNot Nothing AndAlso Not IsDestroyed AndAlso _Sink.Receive(Converted) Then
+                    If (_Sink IsNot Nothing AndAlso _Sink.Receive(Converted)) OrElse Dropping Then
                         Worked = True
-                    ElseIf Dropping OrElse IsDestroyed Then
-                        Discard(Value)
                     Else
-                        Me.Converted.Enqueue(Converted)
+                        OutputsCache.Enqueue(Converted)
                     End If
                 End If
             Loop While Recursive And Worked
-            Threading.Interlocked.Decrement(Threads)
-        End Sub
-        Public Overrides Sub Destroy()
-            MyBase.Destroy()
-            Destroy(Values)
-            Destroy(Converted)
         End Sub
         Sub New()
             MyBase.New()

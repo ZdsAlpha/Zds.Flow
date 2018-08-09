@@ -3,7 +3,7 @@ Imports Zds.Flow.Interfaces
 
 Namespace Machinery.Core
     Public MustInherit Class Converter(Of Input, Output)
-        Inherits Base
+        Inherits Machinery
         Implements IConverter(Of Input, Output)
         Public Property Sink As ISink(Of Output) Implements ISource(Of Output).Sink
         Public Property Convert As ConvertDelegate
@@ -21,12 +21,8 @@ Namespace Machinery.Core
             MyBase.Destroy()
             Dim _Queue = Queue
             Queue = Nothing
-            Dim Round As Round(Of Input) = TryCast(_Queue, Round(Of Input))
-            If Round IsNot Nothing Then
-                Destroy(Round)
-            Else
-                Discard(_Queue)
-            End If
+            Dim Disposable As IDisposable = TryCast(_Queue, IDisposable)
+            If Disposable IsNot Nothing Then Disposable.Dispose()
         End Sub
         Sub New()
             Queue = New Round(Of Input)()

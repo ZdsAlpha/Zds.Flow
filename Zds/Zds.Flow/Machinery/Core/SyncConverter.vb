@@ -17,21 +17,15 @@ Namespace Machinery.Core
                 If HasValue And Not HasConverted Then
                     If Convert(Value, Converted) Then
                         HasConverted = True
-                    ElseIf MustConvert And Not IsDestroyed Then
+                    ElseIf MustConvert Then
                         Exit Do
-                    Else
-                        Discard(Value)
                     End If
                     HasValue = False
                     Value = Nothing
                 End If
                 'Sinking converted value
                 If HasConverted Then
-                    If _Sink IsNot Nothing AndAlso Not IsDestroyed AndAlso _Sink.Receive(Converted) Then
-                        HasConverted = False
-                        Converted = Nothing
-                    ElseIf Dropping OrElse IsDestroyed Then
-                        Discard(Converted)
+                    If (_Sink IsNot Nothing AndAlso _Sink.Receive(Converted)) OrElse Dropping Then
                         HasConverted = False
                         Converted = Nothing
                     Else
@@ -41,15 +35,6 @@ Namespace Machinery.Core
                     Exit Do
                 End If
             Loop While Recursive
-        End Sub
-        Public Overrides Sub Destroy()
-            MyBase.Destroy()
-            HasValue = False
-            Discard(Value)
-            Value = Nothing
-            HasConverted = False
-            Discard(Converted)
-            Converted = Nothing
         End Sub
         Sub New()
             MyBase.New()

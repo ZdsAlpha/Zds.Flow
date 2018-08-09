@@ -13,7 +13,7 @@
         End Property
         Protected Overrides Sub OnUpdated()
             MyBase.OnUpdated()
-            If Not IsLocked AndAlso Threading.Monitor.TryEnter(_Lock) Then
+            If Not _IsLocked AndAlso Threading.Monitor.TryEnter(_Lock) Then
                 _IsLocked = True
                 Try
                     SyncUpdate()

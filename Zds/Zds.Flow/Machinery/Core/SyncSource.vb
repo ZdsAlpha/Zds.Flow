@@ -8,21 +8,11 @@
             Dim _Sink = Sink
             If Not HasValue Then HasValue = Generate(Value)
             If HasValue Then
-                If _Sink IsNot Nothing AndAlso Not IsDestroyed AndAlso _Sink.Receive(Value) Then
-                    HasValue = False
-                    Value = Nothing
-                ElseIf Dropping OrElse IsDestroyed Then
-                    Discard(Value)
+                If (_Sink IsNot Nothing AndAlso _Sink.Receive(Value)) OrElse Dropping Then
                     HasValue = False
                     Value = Nothing
                 End If
             End If
-        End Sub
-        Public Overrides Sub Destroy()
-            MyBase.Destroy()
-            HasValue = False
-            Discard(Value)
-            Value = Nothing
         End Sub
         Sub New()
             MyBase.New()

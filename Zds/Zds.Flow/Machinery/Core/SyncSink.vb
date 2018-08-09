@@ -13,20 +13,10 @@ Namespace Machinery.Core
                 If HasValue AndAlso Sink(Value) Then
                     HasValue = False
                     Value = Nothing
-                ElseIf IsDestroyed Then
-                    Discard(Value)
-                    HasValue = False
-                    Value = Nothing
                 Else
                     Exit Do
                 End If
             Loop While Recursive
-        End Sub
-        Public Overrides Sub Destroy()
-            MyBase.Destroy()
-            HasValue = False
-            Discard(Value)
-            Value = Nothing
         End Sub
         Sub New()
             MyBase.New

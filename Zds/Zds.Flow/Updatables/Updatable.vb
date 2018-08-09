@@ -100,9 +100,18 @@
             RaiseEvent OnDestroyedEvent(Me)
         End Sub
         Protected Overridable Sub Handle(ex As Exception)
-            Dim Updater As Updaters.IUpdater = Me.Updater
             If ExceptionHandler IsNot Nothing Then ExceptionHandler.Catch(Me, ex)
-            If Updater IsNot Nothing AndAlso Updater.ExceptionHandler IsNot Nothing Then Updater.ExceptionHandler.Catch(Me, ex)
+            Dim Updatable As IUpdatable = Me
+            Dim Updater As Updaters.IUpdater = Updatable.Updater
+            While Updater IsNot Nothing
+                If Updater.ExceptionHandler IsNot Nothing Then Updater.ExceptionHandler.Catch(Updatable, ex)
+                Updatable = TryCast(Updater, IUpdatable)
+                If Updatable IsNot Nothing Then
+                    Updater = Updatable.Updater
+                Else
+                    Updater = Nothing
+                End If
+            End While
             If ex.GetType Is GetType(Threading.ThreadAbortException) Then Threading.Thread.ResetAbort()
         End Sub
         Sub New()
