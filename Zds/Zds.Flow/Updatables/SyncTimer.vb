@@ -26,6 +26,9 @@
                 _LastError = value.Ticks
             End Set
         End Property
+        Public Sub TickNow()
+            LastTick = Stopwatch.Elapsed - Delay
+        End Sub
         Public Overrides Sub Start()
             MyBase.Start()
             If IsRunning Then _Stopwatch.Start()
