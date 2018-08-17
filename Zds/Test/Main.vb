@@ -1,15 +1,34 @@
 Imports System.Drawing
 Imports System.Drawing.Imaging
+Imports System.Numerics
 Imports System.Runtime.InteropServices
 Imports System.Windows.Forms
 Imports Zds.Flow
+Imports Zds.Flow.Collections
 Imports Zds.Flow.Machinery
 Imports Zds.Flow.Machinery.Objects
 Imports Zds.Flow.Updatables
 Public Module Main
     Public Sub Main()
-        Dim Updater As Updaters.UpdaterX = Updatable.DefaultUpdater
-        ScreenCapture()
+        Updatable.DefaultUpdater.ExceptionHandler = New ExceptionHandlers.ConsoleLogger
+        Dim Collector As New Misc.Collector(Of Integer)
+        Dim Filter As New Misc.BatchFilter(Of Integer)
+        Dim Emitter As New Misc.Emitter(Of Integer)
+        Dim Sink As New SyncSink(Of Integer)(Function(Obj As Integer) As Boolean
+                                                 Console.Write(Obj.ToString() + vbTab)
+                                                 Return True
+                                             End Function)
+        Collector.Sink = Filter
+        Filter.Sink = Emitter
+        Emitter.Sink = Sink
+        Collector.Start()
+        Emitter.Start()
+        Sink.Start()
+        Dim Random As New Random
+        While True
+            Collector.Receive(Random.Next(0, 10))
+            Threading.Thread.Sleep(1)
+        End While
     End Sub
     Dim frames As Integer = 0
     Public Sub ScreenCapture()
@@ -34,6 +53,101 @@ Public Module Main
         Console.Title = frames.ToString + " fps"
         frames = 0
     End Sub
+
+    Public Function Ratio(Number1 As BigInteger, Number2 As BigInteger) As Double
+        Dim Subtraction = BigInteger.Log(BigInteger.Abs(Number1)) - BigInteger.Log(BigInteger.Abs(Number2))
+        Dim Sign = Number1.Sign * Number2.Sign
+        Return Math.Exp(Subtraction) * Sign
+    End Function
+    Public Sub CustomRatio()
+        Dim Seq As New List(Of BigInteger)
+        Dim Random As New Random()
+        For i = 0 To Integer.MaxValue - 1
+            Dim Number As BigInteger = Random.Next(10)
+            For j = 0 To Seq.Count - 1
+                Dim OldNumber As BigInteger = Seq(j)
+                Seq(j) = Number
+                Number = Number - OldNumber
+            Next
+            Seq.Add(Number)
+            If Seq.Count >= 2 Then Console.WriteLine(Ratio(Seq(Seq.Count - 1), Seq(Seq.Count - 2)).ToString + vbTab + vbTab)
+        Next
+    End Sub
+    Public Sub LucasRatio()
+        Dim Seq As New List(Of BigInteger)
+        Dim N0 As BigInteger = -1
+        Dim N1 As BigInteger = 2
+        For i = 0 To Integer.MaxValue - 1
+            Dim Number As BigInteger = N0 + N1
+            N0 = N1
+            N1 = Number
+            For j = 0 To Seq.Count - 1
+                Dim OldNumber As BigInteger = Seq(j)
+                Seq(j) = Number
+                Number = Number - OldNumber
+            Next
+            Seq.Add(Number)
+            If Seq.Count >= 2 Then Console.WriteLine(Ratio(Seq(Seq.Count - 1), Seq(Seq.Count - 2)).ToString + vbTab + vbTab)
+        Next
+    End Sub
+    Public Sub FibonacciRatio()
+        Dim Seq As New List(Of BigInteger)
+        Dim N0 As BigInteger = 0
+        Dim N1 As BigInteger = 1
+        For i = 0 To Integer.MaxValue - 1
+            Dim Number As BigInteger = N0 + N1
+            N0 = N1
+            N1 = Number
+            For j = 0 To Seq.Count - 1
+                Dim OldNumber As BigInteger = Seq(j)
+                Seq(j) = Number
+                Number = Number - OldNumber
+            Next
+            Seq.Add(Number)
+            If Seq.Count >= 2 Then Console.WriteLine(Ratio(Seq(Seq.Count - 1), Seq(Seq.Count - 2)).ToString + vbTab + vbTab)
+        Next
+    End Sub
+    Public Sub PrimeRatio()
+        Dim Seq As New List(Of BigInteger)
+        Dim Primes As New Int32List
+        For i = 2 To Integer.MaxValue - 1
+            Dim IsPrime As Boolean = True
+            For j = 2 To i - 1
+                If i Mod j = 0 Then
+                    IsPrime = False
+                    Exit For
+                End If
+            Next
+            Primes(i) = IsPrime
+            If IsPrime Then
+                Dim Number As BigInteger = i
+                For j = 0 To Seq.Count - 1
+                    Dim OldNumber As BigInteger = Seq(j)
+                    Seq(j) = Number
+                    Number = Number - OldNumber
+                Next
+                Seq.Add(Number)
+                If Seq.Count >= 2 Then Console.WriteLine(Ratio(Seq(Seq.Count - 1), Seq(Seq.Count - 2)).ToString + vbTab + vbTab)
+            End If
+        Next
+        Stop
+    End Sub
+    Public Iterator Function PrimeNumbers() As IEnumerable(Of UInt32)
+        Dim Primes As New Int32List
+        For i As UInt32 = 2 To UInt32.MaxValue - 1
+            Dim IsPrime As Boolean = True
+            For j As UInt32 = 2 To i - 1
+                If i Mod j = 0 Then
+                    IsPrime = False
+                    Exit For
+                End If
+            Next
+            Primes(i) = IsPrime
+            If IsPrime Then
+                Yield i
+            End If
+        Next
+    End Function
 End Module
 Public Class ScreenCapture
     Inherits Systems.Machinery

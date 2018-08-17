@@ -1,6 +1,5 @@
 ﻿Namespace Machinery
     Public Interface ISource
-        Inherits Interfaces.IActivatable, Interfaces.IDestroyable
     End Interface
     Public Interface ISource(Of Output)
         Inherits ISource

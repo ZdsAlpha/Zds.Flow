@@ -13,7 +13,7 @@ Namespace Machinery.Core
             If IsDestroyed OrElse _Queue Is Nothing Then Return False
             Return _Queue.Enqueue(obj)
         End Function
-        Public Overrides Sub Destroy() Implements IDestroyable.Destroy
+        Public Overrides Sub Destroy()
             If IsDestroyed Then Exit Sub
             MyBase.Destroy()
             Dim _Queue = Queue
@@ -22,7 +22,7 @@ Namespace Machinery.Core
             If Disposable IsNot Nothing Then Disposable.Dispose()
         End Sub
         Sub New()
-            Queue = New Round(Of Input)()
+            Queue = New SafeRound(Of Input)()
         End Sub
         Sub New(Buffer As IQueue(Of Input))
             Me.Queue = Buffer

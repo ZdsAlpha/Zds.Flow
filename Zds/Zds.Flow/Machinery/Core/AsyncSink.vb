@@ -3,7 +3,7 @@
 Namespace Machinery.Core
     Public Class AsyncSink(Of Input)
         Inherits Sink(Of Input)
-        Public ReadOnly InputsCache As New DynamicRound(Of Input)
+        Public ReadOnly InputsCache As New SafeDynamicRound(Of Input)
         Public Overrides Sub Activate()
             If IsDestroyed Then Exit Sub
             Do

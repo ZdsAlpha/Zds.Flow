@@ -1,6 +1,5 @@
 ﻿Namespace Machinery
     Public Interface IConverter
-        Inherits Interfaces.IActivatable
         Inherits ISink, ISource
     End Interface
     Public Interface IConverter(Of Input, Output)

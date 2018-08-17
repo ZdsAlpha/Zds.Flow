@@ -1,5 +1,4 @@
 ﻿Namespace Collections
-    <DebuggerStepThrough>
     Public Class DynamicRound(Of T)
         Inherits Round(Of T)
         Private _GrowthFactor As Single
@@ -45,92 +44,80 @@
             End Set
         End Property
 
-        Public Overrides Function SetSize(Size As Integer, Optional Forced As Boolean = True) As Boolean
+        Public Overrides Function SetSize(Size As Integer, Forced As Boolean) As Boolean
             If Size < MinSize Then Size = MinSize
             Return MyBase.SetSize(Size, Forced)
         End Function
-        Public Overrides Function SetLength(Length As Integer, Optional AutoResize As Boolean = True) As Boolean
-            SyncLock _Lock
-                If AutoResize Then EnsureLength(Length)
-                Return MyBase.SetLength(Length, AutoResize)
-            End SyncLock
+        Public Overrides Function SetLength(Length As Integer, AutoResize As Boolean) As Boolean
+            If AutoResize Then EnsureLength(Length)
+            Return MyBase.SetLength(Length, AutoResize)
         End Function
-        Public Overrides Function AddFirst(Count As Integer) As Integer
-            SyncLock _Lock
-                EnsureLength(Length + Count)
-                Return MyBase.AddFirst(Count)
-            End SyncLock
+        Public Overrides Function ExtendFirst(Count As Integer) As Integer
+            EnsureLength(Length + Count)
+            Return MyBase.ExtendFirst(Count)
         End Function
-        Public Overrides Function AddLast(Count As Integer) As Integer
-            SyncLock _Lock
-                EnsureLength(Length + Count)
-                Return MyBase.AddLast(Count)
-            End SyncLock
+        Public Overrides Function ExtendLast(Count As Integer) As Integer
+            EnsureLength(Length + Count)
+            Return MyBase.ExtendLast(Count)
         End Function
-        Public Overrides Function AddFirst(Element As T) As Boolean
-            SyncLock _Lock
-                EnsureLength(Length + 1)
-                Return MyBase.AddFirst(Element)
-            End SyncLock
+        Public Overrides Function ShrinkFirst(Count As Integer) As Integer
+            Dim num = MyBase.ShrinkFirst(Count)
+            EnsureLength(Length - num)
+            Return num
         End Function
-        Public Overrides Function AddLast(Element As T) As Boolean
-            SyncLock _Lock
-                EnsureLength(Length + 1)
-                Return MyBase.AddLast(Element)
-            End SyncLock
+        Public Overrides Function ShrinkLast(Count As Integer) As Integer
+            Dim num = MyBase.ShrinkLast(Count)
+            EnsureLength(Length - num)
+            Return num
         End Function
-        Public Overrides Function AddFirst(Elements() As T, Start As Integer, Length As Integer, Optional Overwrite As Boolean = False) As Integer
-            SyncLock _Lock
-                EnsureLength(Me.Length + Length)
-                Return MyBase.AddFirst(Elements, Start, Length, Overwrite)
-            End SyncLock
+        Public Overrides Function AddFirst(Element As T, Overwrite As Boolean) As Boolean
+            If Not Overwrite Then EnsureLength(Length + 1)
+            Return MyBase.AddFirst(Element, Overwrite)
         End Function
-        Public Overrides Function AddLast(Elements() As T, Start As Integer, Length As Integer, Optional Overwrite As Boolean = False) As Integer
-            SyncLock _Lock
-                EnsureLength(Me.Length + Length)
-                Return MyBase.AddLast(Elements, Start, Length, Overwrite)
-            End SyncLock
+        Public Overrides Function AddLast(Element As T, Overwrite As Boolean) As Boolean
+            If Not Overwrite Then EnsureLength(Length + 1)
+            Return MyBase.AddLast(Element, Overwrite)
         End Function
-        Public Overrides Function RemoveFirst(Count As Integer) As Integer
-            SyncLock _Lock
-                Dim num = MyBase.RemoveFirst(Count)
-                EnsureLength(Length - num)
-                Return num
-            End SyncLock
+        Public Overrides Function AddFirst(Source() As T, Start As Integer, Length As Integer, Overwrite As Boolean) As Integer
+            If Start + Length > Source.Length Then Length = Source.Length - Start
+            If Not Overwrite Then EnsureLength(Me.Length + Length)
+            Return MyBase.AddFirst(Source, Start, Length, Overwrite)
         End Function
-        Public Overrides Function RemoveLast(Count As Integer) As Integer
-            SyncLock _Lock
-                Dim num = MyBase.RemoveLast(Count)
-                EnsureLength(Length - num)
-                Return num
-            End SyncLock
+        Public Overrides Function AddLast(Source() As T, Start As Integer, Length As Integer, Overwrite As Boolean) As Integer
+            If Start + Length > Source.Length Then Length = Source.Length - Start
+            If Not Overwrite Then EnsureLength(Me.Length + Length)
+            Return MyBase.AddLast(Source, Start, Length, Overwrite)
         End Function
         Public Overrides Function RemoveFirst(ByRef Element As T) As Boolean
-            SyncLock _Lock
-                Dim output = MyBase.RemoveFirst(Element)
-                EnsureLength(Length - 1)
-                Return output
-            End SyncLock
+            Dim output = MyBase.RemoveFirst(Element)
+            If output Then EnsureLength(Length - 1)
+            Return output
         End Function
         Public Overrides Function RemoveLast(ByRef Element As T) As Boolean
-            SyncLock _Lock
-                Dim output = MyBase.RemoveLast(Element)
-                EnsureLength(Length - 1)
-                Return output
-            End SyncLock
+            Dim output = MyBase.RemoveLast(Element)
+            If output Then EnsureLength(Length - 1)
+            Return output
+        End Function
+        Public Overrides Function RemoveFirst(Destination() As T, Start As Integer, Length As Integer) As Integer
+            Dim output = MyBase.RemoveFirst(Destination, Start, Length)
+            EnsureLength(Length - output)
+            Return output
+        End Function
+        Public Overrides Function RemoveLast(Destination() As T, Start As Integer, Length As Integer) As Integer
+            Dim output = MyBase.RemoveLast(Destination, Start, Length)
+            EnsureLength(Length - output)
+            Return output
         End Function
 
         Public Function EnsureLength(Length As Integer) As Integer
-            SyncLock _Lock
-                If Length <= 0 Then Length = 1
-                Dim _Size As Integer = _Buffer.Length
-                Dim Size As Long = Math.Ceiling(MinSize * Math.Pow(GrowthFactor, Math.Ceiling(Math.Log(Length / MinSize) / Math.Log(GrowthFactor))))
-                If _Size > AverageSize And Size < AverageSize Then Size = AverageSize
-                If Size < MinSize Then Size = MinSize
-                If Size > MaxSize Then Size = MaxSize
-                If Size <> _Size Then SetSize(Size)
-                Return Size
-            End SyncLock
+            If Length <= 0 Then Length = 1
+            Dim _Size As Integer = _Buffer.Length
+            Dim Size As Long = Math.Ceiling(MinSize * Math.Pow(GrowthFactor, Math.Ceiling(Math.Log(Length / MinSize) / Math.Log(GrowthFactor))))
+            If _Size > AverageSize And Size < AverageSize Then Size = AverageSize
+            If Size < MinSize Then Size = MinSize
+            If Size > MaxSize Then Size = MaxSize
+            If Size <> _Size Then SetSize(Size, True)
+            Return Size
         End Function
 
         Sub New()

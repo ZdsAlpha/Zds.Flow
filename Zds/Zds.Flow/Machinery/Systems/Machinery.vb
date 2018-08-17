@@ -19,6 +19,22 @@ Namespace Machinery.Systems
                 UnsafeObjects.Remove(Obj)
             End SyncLock
         End Sub
+        Public Overrides Sub Start()
+            MyBase.Start()
+            If IsRunning Then
+                For Each Updatable In Targets
+                    Updatable.Start()
+                Next
+            End If
+        End Sub
+        Public Overrides Sub [Stop]()
+            MyBase.Stop()
+            If Not IsRunning Then
+                For Each Updatable In Targets
+                    Updatable.Stop()
+                Next
+            End If
+        End Sub
         Protected Overridable Overloads Sub Destroy(Obj As Object)
             Dim Disposable As IDisposable = TryCast(Obj, IDisposable)
             If Disposable IsNot Nothing Then Disposable.Dispose()

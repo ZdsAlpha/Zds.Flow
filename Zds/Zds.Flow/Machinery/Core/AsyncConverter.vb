@@ -3,8 +3,8 @@
 Namespace Machinery.Core
     Public Class AsyncConverter(Of Input, Output)
         Inherits Converter(Of Input, Output)
-        Public ReadOnly InputsCache As New DynamicRound(Of Input)
-        Public ReadOnly OutputsCache As New DynamicRound(Of Output)
+        Public ReadOnly InputsCache As New SafeDynamicRound(Of Input)
+        Public ReadOnly OutputsCache As New SafeDynamicRound(Of Output)
         Public Overrides Sub Activate()
             If IsDestroyed Then Exit Sub
             Dim Worked As Boolean = False

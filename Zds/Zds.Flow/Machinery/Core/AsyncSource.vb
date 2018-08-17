@@ -3,7 +3,7 @@
 Namespace Machinery.Core
     Public Class AsyncSource(Of Output)
         Inherits Source(Of Output)
-        Public ReadOnly OutputsCache As New DynamicRound(Of Output)
+        Public ReadOnly OutputsCache As New SafeDynamicRound(Of Output)
         Public Overrides Sub Activate()
             If IsDestroyed Then Exit Sub
             Dim _Sink = Sink
