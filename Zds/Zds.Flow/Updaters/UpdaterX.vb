@@ -5,12 +5,44 @@ Namespace Updaters
     <DebuggerStepThrough>
     Public Class UpdaterX
         Inherits Updater
+        Private _ThreadCreatedEvent As SafeList(Of UpdaterXEventDelegate)
+        Private _ThreadDestroyedEvent As SafeList(Of UpdaterXEventDelegate)
         Private _Threads As New SafeList(Of Threading.Thread)
         Private _TotalThreads As Integer = 0
         Private _IdleThreads As Integer = 0
         Private _AvailableThreads As Integer = 0
-        Public Event ThreadCreated(Sender As UpdaterX)
-        Public Event ThreadDestroyed(Sender As UpdaterX)
+        Public Custom Event ThreadCreatedEvent As UpdaterXEventDelegate
+            AddHandler(value As UpdaterXEventDelegate)
+                If _ThreadCreatedEvent Is Nothing Then _ThreadCreatedEvent = New SafeList(Of UpdaterXEventDelegate)
+                _ThreadCreatedEvent.Add(value)
+            End AddHandler
+            RemoveHandler(value As UpdaterXEventDelegate)
+                If _ThreadCreatedEvent IsNot Nothing Then _ThreadCreatedEvent.Remove(value)
+            End RemoveHandler
+            RaiseEvent(Sender As UpdaterX, Thread As Threading.Thread)
+                If _ThreadCreatedEvent IsNot Nothing Then
+                    For Each [Delegate] In _ThreadCreatedEvent.Elements
+                        [Delegate].Invoke(Sender, Thread)
+                    Next
+                End If
+            End RaiseEvent
+        End Event
+        Public Custom Event ThreadDestroyedEvent As UpdaterXEventDelegate
+            AddHandler(value As UpdaterXEventDelegate)
+                If _ThreadDestroyedEvent Is Nothing Then _ThreadDestroyedEvent = New SafeList(Of UpdaterXEventDelegate)
+                _ThreadDestroyedEvent.Add(value)
+            End AddHandler
+            RemoveHandler(value As UpdaterXEventDelegate)
+                If _ThreadDestroyedEvent IsNot Nothing Then _ThreadDestroyedEvent.Remove(value)
+            End RemoveHandler
+            RaiseEvent(Sender As UpdaterX, Thread As Threading.Thread)
+                If _ThreadDestroyedEvent IsNot Nothing Then
+                    For Each [Delegate] In _ThreadDestroyedEvent.Elements
+                        [Delegate].Invoke(Sender, Thread)
+                    Next
+                End If
+            End RaiseEvent
+        End Event
         Public Property MaxThreads As Integer = 50
         Public Property MaxIdleThreads As Integer = 10
         Public Property MinThreadLifeSpan As TimeSpan = TimeSpan.FromMinutes(1)
@@ -77,8 +109,8 @@ Namespace Updaters
         Protected Overridable Sub Work()
             If IsDestroyed Then Exit Sub
             If Not IsRunning Or Targets.Length = 0 Then Exit Sub
-            RaiseEvent ThreadCreated(Me)
             Dim Thread As Threading.Thread = Threading.Thread.CurrentThread
+            RaiseEvent ThreadCreatedEvent(Me, Thread)
             _Threads.Add(Thread)
             Threading.Interlocked.Increment(_TotalThreads)
             Threading.Interlocked.Increment(_IdleThreads)
@@ -106,7 +138,9 @@ Namespace Updaters
             _Threads.Remove(Thread)
             Threading.Interlocked.Decrement(_IdleThreads)
             Threading.Interlocked.Decrement(_TotalThreads)
-            RaiseEvent ThreadDestroyed(Me)
+            RaiseEvent ThreadDestroyedEvent(Me, Thread)
         End Sub
+
+        Public Delegate Sub UpdaterXEventDelegate(Sender As UpdaterX, Thread As Threading.Thread)
     End Class
 End Namespace

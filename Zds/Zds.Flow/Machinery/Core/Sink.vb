@@ -3,11 +3,11 @@ Imports Zds.Flow.Interfaces
 
 Namespace Machinery.Core
     Public MustInherit Class Sink(Of Input)
-        Inherits Machinery
+        Inherits Machine
         Implements ISink(Of Input)
         Public Property Sink As SinkDelegate
         Public Property Queue As IQueue(Of Input)
-        Public Property Recursive As Boolean = True
+        Public Property Recursive As Boolean = False
         Public Function Receive(obj As Input) As Boolean Implements ISink(Of Input).Receive
             Dim _Queue = Queue
             If IsDestroyed OrElse _Queue Is Nothing Then Return False

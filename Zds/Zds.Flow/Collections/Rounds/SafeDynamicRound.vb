@@ -104,5 +104,12 @@
                 Return MyBase.ToArray()
             End SyncLock
         End Function
+
+        Sub New()
+            MyBase.New()
+        End Sub
+        Sub New(MinSize As Integer)
+            MyBase.New(MinSize)
+        End Sub
     End Class
 End Namespace

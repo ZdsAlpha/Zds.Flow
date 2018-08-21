@@ -13,6 +13,11 @@
                 Queue.SetSize(value, True)
             End Set
         End Property
+        Public ReadOnly Property QueueLength As Integer
+            Get
+                Return Queue.Length
+            End Get
+        End Property
         Protected Overrides Sub Tick(ByRef Time As TimeSpan)
             MyBase.Tick(Time)
             Dim _Sink = Sink

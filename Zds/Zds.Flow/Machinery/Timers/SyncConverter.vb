@@ -80,7 +80,7 @@ Namespace Machinery.Timers
         End Sub
         Sub New(Updater As Updaters.IUpdater)
             MyBase.New(Updater)
-            _Converter = New Core.SyncConverter(Of Input, Output)
+            _Converter = New Core.SyncConverter(Of Input, Output)()
             _Converter.Convert = AddressOf InternalConvert
         End Sub
         Sub New(Updater As Updaters.IUpdater, Convert As Core.Converter(Of Input, Output).ConvertDelegate)

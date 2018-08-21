@@ -1,11 +1,28 @@
-﻿Namespace Updatables
+﻿Imports Zds.Flow.Collections
+Namespace Updatables
     <DebuggerStepThrough>
     Public Class AsyncTimer
         Inherits AsyncObject
         Implements IAsyncTimer
-        Public Event TickEvent(Sender As AsyncTimer, ByRef Time As TimeSpan)
+        Public _TickEvent As SafeList(Of AsyncTimerEventDelegate)
         Private _LastError As Long
         Private _IsLocked As Boolean
+        Public Custom Event TickEvent As AsyncTimerEventDelegate
+            AddHandler(value As AsyncTimerEventDelegate)
+                If _TickEvent Is Nothing Then _TickEvent = New SafeList(Of AsyncTimerEventDelegate)
+                _TickEvent.Add(value)
+            End AddHandler
+            RemoveHandler(value As AsyncTimerEventDelegate)
+                If _TickEvent IsNot Nothing Then _TickEvent.Remove(value)
+            End RemoveHandler
+            RaiseEvent(Sender As IAsyncTimer, ByRef Time As TimeSpan)
+                If _TickEvent IsNot Nothing Then
+                    For Each [Delegate] In _TickEvent.Elements
+                        [Delegate].Invoke(Sender, Time)
+                    Next
+                End If
+            End RaiseEvent
+        End Event
         Protected ReadOnly Property Lock As New Object
         Public Property LastTick As TimeSpan Implements IAsyncTimer.LastTick
         Public Property Delay As TimeSpan = TimeSpan.FromSeconds(1) Implements IAsyncTimer.Delay
@@ -77,12 +94,14 @@
         Sub New(Updater As Updaters.IUpdater)
             MyBase.New(Updater)
         End Sub
-        Sub New(Tick As TickEventEventHandler)
+        Sub New(Tick As AsyncTimerEventDelegate)
             AddHandler TickEvent, Tick
         End Sub
-        Sub New(Updater As Updaters.IUpdater, Tick As TickEventEventHandler)
+        Sub New(Updater As Updaters.IUpdater, Tick As AsyncTimerEventDelegate)
             MyBase.New(Updater)
             AddHandler TickEvent, Tick
         End Sub
+
+        Public Delegate Sub AsyncTimerEventDelegate(Sender As IAsyncTimer, ByRef Time As TimeSpan)
     End Class
 End Namespace

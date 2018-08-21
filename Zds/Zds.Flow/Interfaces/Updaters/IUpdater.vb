@@ -1,6 +1,6 @@
 ﻿Namespace Updaters
     Public Interface IUpdater
-        Inherits Interfaces.IDestroyable, Interfaces.IStartStopable, Interfaces.IPauseResumable, Interfaces.IThrowsException
+        Inherits ExceptionHandling.IThrowsException, Interfaces.IDestroyable, Interfaces.IStartStopable, Interfaces.IPauseResumable
         ReadOnly Property Targets As Updatables.IUpdatable()
         Property DelayHandler As DelayHandlers.IDelayHandler
         Sub Add(Updatable As Updatables.IUpdatable)

@@ -1,7 +1,7 @@
 ﻿Imports Zds.Flow.Interfaces
 
 Namespace Machinery.Core
-    Public MustInherit Class Machinery
+    Public MustInherit Class Machine
         Implements IMachinery, IDestroyable, IActivatable
         Public ReadOnly Property IsDestroyed As Boolean Implements IDestroyable.IsDestroyed
         Public MustOverride Sub Activate() Implements IActivatable.Activate

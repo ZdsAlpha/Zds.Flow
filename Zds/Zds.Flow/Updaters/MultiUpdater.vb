@@ -3,12 +3,44 @@ Namespace Updaters
     <DebuggerStepThrough>
     Public Class MultiUpdater
         Inherits Updater
+        Private _ThreadCreatedEvent As SafeList(Of UpdaterXEventDelegate)
+        Private _ThreadDestroyedEvent As SafeList(Of UpdaterXEventDelegate)
         Private _Threads As New SafeList(Of Threading.Thread)
         Private _TotalThreads As ULong = 0
         Private _IdleThreads As ULong = 0
         Private _IsBackground As Boolean = False
-        Public Event ThreadCreated(Sender As MultiUpdater)
-        Public Event ThreadDestroyed(Sender As MultiUpdater)
+        Public Custom Event ThreadCreatedEvent As UpdaterXEventDelegate
+            AddHandler(value As UpdaterXEventDelegate)
+                If _ThreadCreatedEvent Is Nothing Then _ThreadCreatedEvent = New SafeList(Of UpdaterXEventDelegate)
+                _ThreadCreatedEvent.Add(value)
+            End AddHandler
+            RemoveHandler(value As UpdaterXEventDelegate)
+                If _ThreadCreatedEvent IsNot Nothing Then _ThreadCreatedEvent.Remove(value)
+            End RemoveHandler
+            RaiseEvent(Sender As MultiUpdater, Thread As Threading.Thread)
+                If _ThreadCreatedEvent IsNot Nothing Then
+                    For Each [Delegate] In _ThreadCreatedEvent.Elements
+                        [Delegate].Invoke(Sender, Thread)
+                    Next
+                End If
+            End RaiseEvent
+        End Event
+        Public Custom Event ThreadDestroyedEvent As UpdaterXEventDelegate
+            AddHandler(value As UpdaterXEventDelegate)
+                If _ThreadDestroyedEvent Is Nothing Then _ThreadDestroyedEvent = New SafeList(Of UpdaterXEventDelegate)
+                _ThreadDestroyedEvent.Add(value)
+            End AddHandler
+            RemoveHandler(value As UpdaterXEventDelegate)
+                If _ThreadDestroyedEvent IsNot Nothing Then _ThreadDestroyedEvent.Remove(value)
+            End RemoveHandler
+            RaiseEvent(Sender As MultiUpdater, Thread As Threading.Thread)
+                If _ThreadDestroyedEvent IsNot Nothing Then
+                    For Each [Delegate] In _ThreadDestroyedEvent.Elements
+                        [Delegate].Invoke(Sender, Thread)
+                    Next
+                End If
+            End RaiseEvent
+        End Event
         Public Property MaxThreads As ULong = 50
         Public Property MaxIdleThreads As ULong = 10
         Public Property AutoCreateThreads As Boolean = True
@@ -89,9 +121,9 @@ Namespace Updaters
         Protected Overridable Sub Work()
             If IsDestroyed Then Exit Sub
             If Not IsRunning Then Exit Sub
-            RaiseEvent ThreadCreated(Me)
+            Dim Thread As Threading.Thread = Threading.Thread.CurrentThread
+            RaiseEvent ThreadCreatedEvent(Me, Thread)
             SyncLock Lock
-                Dim Thread As Threading.Thread = Threading.Thread.CurrentThread
                 Thread.IsBackground = _IsBackground
                 _Threads.Add(Thread)
                 _TotalThreads += 1
@@ -118,13 +150,14 @@ Namespace Updaters
                 If DelayHandler IsNot Nothing Then DelayHandler.Delay()
             Loop
             SyncLock Lock
-                Dim Thread As Threading.Thread = Threading.Thread.CurrentThread
                 If Thread.IsThreadPoolThread Then Thread.IsBackground = True
                 _Threads.Remove(Thread)
                 _TotalThreads -= 1
                 _IdleThreads -= 1
             End SyncLock
-            RaiseEvent ThreadDestroyed(Me)
+            RaiseEvent ThreadDestroyedEvent(Me, Thread)
         End Sub
+
+        Public Delegate Sub UpdaterXEventDelegate(Sender As MultiUpdater, Thread As Threading.Thread)
     End Class
 End Namespace

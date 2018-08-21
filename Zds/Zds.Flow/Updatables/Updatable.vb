@@ -1,16 +1,113 @@
-﻿Namespace Updatables
+﻿Imports Zds.Flow.Collections
+Namespace Updatables
     <DebuggerStepThrough>
     Public Class Updatable
         Implements IUpdatable
-        Public Event PreUpdateEvent(Sender As IUpdatable)
-        Public Event PostUpdateEvent(Sender As IUpdatable)
-        Public Event OnDestroyedEvent(Sender As IUpdatable)
-        Public Event OnStartedEvent(Sender As IUpdatable)
-        Public Event OnStoppedEvent(Sender As IUpdatable)
+        Private _OnException As SafeList(Of ExceptionHandling.IThrowsException.OnExceptionDelegate)
+        Private _PreUpdateEvent As SafeList(Of UpdatableEventDelegate)
+        Private _PostUpdateEvent As SafeList(Of UpdatableEventDelegate)
+        Private _OnDestroyedEvent As SafeList(Of UpdatableEventDelegate)
+        Private _OnStartedEvent As SafeList(Of UpdatableEventDelegate)
+        Private _OnStoppedEvent As SafeList(Of UpdatableEventDelegate)
         Private _IsDestroyed As Boolean = False
         Private _IsRunning As Boolean = False
         Private _Updater As Updaters.IUpdater
-        Public Property ExceptionHandler As ExceptionHandlers.IExceptionHandler Implements IUpdatable.ExceptionHandler
+        Public Custom Event OnException As ExceptionHandling.IThrowsException.OnExceptionDelegate Implements ExceptionHandling.IThrowsException.OnException
+            AddHandler(value As ExceptionHandling.IThrowsException.OnExceptionDelegate)
+                If _OnException Is Nothing Then _OnException = New SafeList(Of ExceptionHandling.IThrowsException.OnExceptionDelegate)
+                _OnException.Add(value)
+            End AddHandler
+            RemoveHandler(value As ExceptionHandling.IThrowsException.OnExceptionDelegate)
+                If _OnException IsNot Nothing Then _OnException.Remove(value)
+            End RemoveHandler
+            RaiseEvent(Sender As Object, Exception As Exception)
+                If _OnException IsNot Nothing Then
+                    For Each [Delegate] In _OnException.Elements
+                        [Delegate].Invoke(Sender, Exception)
+                    Next
+                End If
+            End RaiseEvent
+        End Event
+        Public Custom Event PreUpdateEvent As UpdatableEventDelegate
+            AddHandler(value As UpdatableEventDelegate)
+                If _PreUpdateEvent Is Nothing Then _PreUpdateEvent = New SafeList(Of UpdatableEventDelegate)
+                _PreUpdateEvent.Add(value)
+            End AddHandler
+            RemoveHandler(value As UpdatableEventDelegate)
+                If _PreUpdateEvent IsNot Nothing Then _PreUpdateEvent.Remove(value)
+            End RemoveHandler
+            RaiseEvent(Sender As IUpdatable)
+                If _PreUpdateEvent IsNot Nothing Then
+                    For Each [Delegate] In _PreUpdateEvent.Elements
+                        [Delegate].Invoke(Sender)
+                    Next
+                End If
+            End RaiseEvent
+        End Event
+        Public Custom Event PostUpdateEvent As UpdatableEventDelegate
+            AddHandler(value As UpdatableEventDelegate)
+                If _PostUpdateEvent Is Nothing Then _PostUpdateEvent = New SafeList(Of UpdatableEventDelegate)
+                _PostUpdateEvent.Add(value)
+            End AddHandler
+            RemoveHandler(value As UpdatableEventDelegate)
+                If _PostUpdateEvent IsNot Nothing Then _PostUpdateEvent.Remove(value)
+            End RemoveHandler
+            RaiseEvent(Sender As IUpdatable)
+                If _PostUpdateEvent IsNot Nothing Then
+                    For Each [Delegate] In _PostUpdateEvent.Elements
+                        [Delegate].Invoke(Sender)
+                    Next
+                End If
+            End RaiseEvent
+        End Event
+        Public Custom Event OnDestroyedEvent As UpdatableEventDelegate
+            AddHandler(value As UpdatableEventDelegate)
+                If _OnDestroyedEvent Is Nothing Then _OnDestroyedEvent = New SafeList(Of UpdatableEventDelegate)
+                _OnDestroyedEvent.Add(value)
+            End AddHandler
+            RemoveHandler(value As UpdatableEventDelegate)
+                If _OnDestroyedEvent IsNot Nothing Then _OnDestroyedEvent.Remove(value)
+            End RemoveHandler
+            RaiseEvent(Sender As IUpdatable)
+                If _OnDestroyedEvent IsNot Nothing Then
+                    For Each [Delegate] In _OnDestroyedEvent.Elements
+                        [Delegate].Invoke(Sender)
+                    Next
+                End If
+            End RaiseEvent
+        End Event
+        Public Custom Event OnStartedEvent As UpdatableEventDelegate
+            AddHandler(value As UpdatableEventDelegate)
+                If _OnStartedEvent Is Nothing Then _OnStartedEvent = New SafeList(Of UpdatableEventDelegate)
+                _OnStartedEvent.Add(value)
+            End AddHandler
+            RemoveHandler(value As UpdatableEventDelegate)
+                If _OnStartedEvent IsNot Nothing Then _OnStartedEvent.Remove(value)
+            End RemoveHandler
+            RaiseEvent(Sender As IUpdatable)
+                If _OnStartedEvent IsNot Nothing Then
+                    For Each [Delegate] In _OnStartedEvent.Elements
+                        [Delegate].Invoke(Sender)
+                    Next
+                End If
+            End RaiseEvent
+        End Event
+        Public Custom Event OnStoppedEvent As UpdatableEventDelegate
+            AddHandler(value As UpdatableEventDelegate)
+                If _OnStoppedEvent Is Nothing Then _OnStoppedEvent = New SafeList(Of UpdatableEventDelegate)
+                _OnStoppedEvent.Add(value)
+            End AddHandler
+            RemoveHandler(value As UpdatableEventDelegate)
+                If _OnStoppedEvent IsNot Nothing Then _OnStoppedEvent.Remove(value)
+            End RemoveHandler
+            RaiseEvent(Sender As IUpdatable)
+                If _OnStoppedEvent IsNot Nothing Then
+                    For Each [Delegate] In _OnStoppedEvent.Elements
+                        [Delegate].Invoke(Sender)
+                    Next
+                End If
+            End RaiseEvent
+        End Event
         Public Property Updater As Updaters.IUpdater Implements IUpdatable.Updater
             Get
                 Return _Updater
@@ -43,7 +140,7 @@
                         End If
                     Next
                     If Not HasMe Then
-                        updater.Add(Me)
+                        Updater.Add(Me)
                     End If
                 ElseIf Updater IsNot Nothing And _Updater IsNot Nothing Then
 #Disable Warning BC42026 ' Expression recursively calls the containing property
@@ -100,11 +197,11 @@
             RaiseEvent OnDestroyedEvent(Me)
         End Sub
         Protected Overridable Sub Handle(ex As Exception)
-            If ExceptionHandler IsNot Nothing Then ExceptionHandler.Catch(Me, ex)
+            [Throw](Me, ex)
             Dim Updatable As IUpdatable = Me
             Dim Updater As Updaters.IUpdater = Updatable.Updater
             While Updater IsNot Nothing
-                If Updater.ExceptionHandler IsNot Nothing Then Updater.ExceptionHandler.Catch(Updatable, ex)
+                [Throw](Updatable, ex)
                 Updatable = TryCast(Updater, IUpdatable)
                 If Updatable IsNot Nothing Then
                     Updater = Updatable.Updater
@@ -113,6 +210,9 @@
                 End If
             End While
             If ex.GetType Is GetType(Threading.ThreadAbortException) Then Threading.Thread.ResetAbort()
+        End Sub
+        Private Sub [Throw](Sender As Object, Exception As Exception) Implements ExceptionHandling.IThrowsException.Throw
+            RaiseEvent OnException(Sender, Exception)
         End Sub
         Sub New()
             If DefaultUpdater IsNot Nothing Then
@@ -126,14 +226,14 @@
                 Me.Updater = Updater
             End If
         End Sub
-        Sub New(Update As PreUpdateEventEventHandler)
+        Sub New(Update As UpdatableEventDelegate)
             AddHandler PreUpdateEvent, Update
             If DefaultUpdater IsNot Nothing Then
                 DefaultUpdater.Add(Me)
                 Updater = DefaultUpdater
             End If
         End Sub
-        Sub New(Updater As Updaters.IUpdater, Update As PreUpdateEventEventHandler)
+        Sub New(Updater As Updaters.IUpdater, Update As UpdatableEventDelegate)
             If Updater IsNot Nothing Then
                 Updater.Add(Me)
                 Me.Updater = Updater
@@ -141,6 +241,7 @@
             AddHandler PreUpdateEvent, Update
         End Sub
 
+        Public Delegate Sub UpdatableEventDelegate(Sender As IUpdatable)
         Public Shared Property DefaultUpdater As Updaters.IUpdater
         Shared Sub New()
             DefaultUpdater = New Updaters.UpdaterX()

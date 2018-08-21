@@ -1,13 +1,46 @@
-﻿Namespace Updatables
+﻿Imports Zds.Flow.Collections
+Namespace Updatables
     <DebuggerStepThrough>
     Public Class RigidAnimation
         Inherits RigidStateMachine(Of Decimal)
         Implements IRigidAnimation
         Public Const MinimumState As Decimal = 0
         Public Const MaximumState As Decimal = 0.9999999999999999999999999999D
-        Public Event AnimateEvent(Sender As RigidAnimation, ByRef State As Decimal)
-        Public Event AnimationCompletedEvent(Sender As RigidAnimation)
+        Private _AnimateEvent As SafeList(Of AnimateEventDelegate)
+        Private _AnimationCompletedEvent As SafeList(Of AnimationCompletedEventDelegate)
         Private _Delta As Decimal = 0.1D
+        Public Custom Event AnimateEvent As AnimateEventDelegate
+            AddHandler(value As AnimateEventDelegate)
+                If _AnimateEvent Is Nothing Then _AnimateEvent = New SafeList(Of AnimateEventDelegate)
+                _AnimateEvent.Add(value)
+            End AddHandler
+            RemoveHandler(value As AnimateEventDelegate)
+                If _AnimateEvent IsNot Nothing Then _AnimateEvent.Remove(value)
+            End RemoveHandler
+            RaiseEvent(Sender As IRigidAnimation, ByRef State As Decimal)
+                If _AnimateEvent IsNot Nothing Then
+                    For Each [Delegate] In _AnimateEvent.Elements
+                        [Delegate].Invoke(Sender, State)
+                    Next
+                End If
+            End RaiseEvent
+        End Event
+        Public Custom Event AnimationCompletedEvent As AnimationCompletedEventDelegate
+            AddHandler(value As AnimationCompletedEventDelegate)
+                If _AnimationCompletedEvent Is Nothing Then _AnimationCompletedEvent = New SafeList(Of AnimationCompletedEventDelegate)
+                _AnimationCompletedEvent.Add(value)
+            End AddHandler
+            RemoveHandler(value As AnimationCompletedEventDelegate)
+                If _AnimationCompletedEvent IsNot Nothing Then _AnimationCompletedEvent.Remove(value)
+            End RemoveHandler
+            RaiseEvent(Sender As IRigidAnimation)
+                If _AnimationCompletedEvent IsNot Nothing Then
+                    For Each [Delegate] In _AnimationCompletedEvent.Elements
+                        [Delegate].Invoke(Sender)
+                    Next
+                End If
+            End RaiseEvent
+        End Event
         Public Property IsLoop As Boolean Implements IRigidAnimation.IsLoop
         Public Property FrameSkipping As Boolean Implements IRigidAnimation.FramesSkipping
         Public Property FramesSkipped As ULong Implements IRigidAnimation.FramesSkipped
@@ -146,13 +179,16 @@
             Delay = TimeSpan.FromSeconds(0.1)
             IsTolerant = False
         End Sub
-        Sub New(Animate As AnimateEventEventHandler)
+        Sub New(Animate As AnimateEventDelegate)
             Me.New()
             AddHandler AnimateEvent, Animate
         End Sub
-        Sub New(Updater As Updaters.IUpdater, Animate As AnimateEventEventHandler)
+        Sub New(Updater As Updaters.IUpdater, Animate As AnimateEventDelegate)
             Me.New(Updater)
             AddHandler AnimateEvent, Animate
         End Sub
+
+        Public Delegate Sub AnimateEventDelegate(Sender As IRigidAnimation, ByRef State As Decimal)
+        Public Delegate Sub AnimationCompletedEventDelegate(Sender As IRigidAnimation)
     End Class
 End Namespace

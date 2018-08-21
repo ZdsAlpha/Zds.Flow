@@ -2,7 +2,7 @@
 
 Namespace Machinery.Core
     Public MustInherit Class Source(Of Output)
-        Inherits Machinery
+        Inherits Machine
         Implements ISource(Of Output)
         Public Property Sink As ISink(Of Output) Implements ISource(Of Output).Sink
         Public Property Generate As GenerateDelegate

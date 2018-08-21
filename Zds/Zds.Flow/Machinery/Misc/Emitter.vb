@@ -15,6 +15,11 @@
                 Queue.SetSize(value, True)
             End Set
         End Property
+        Public ReadOnly Property QueueLength As Integer
+            Get
+                Return Queue.Length
+            End Get
+        End Property
         Protected Overrides Sub SyncUpdate()
             MyBase.SyncUpdate()
             Dim _Sink = Sink
@@ -50,7 +55,7 @@
                     Dim Remaining(Input.Length - Map.Length - 1) As T
                     Dim Index As Integer = 0
                     For i = 0 To Input.Length - 1
-                        If Map.Contains(i) Then
+                        If Not Map.Contains(i) Then
                             Remaining(Index) = Input(i)
                             Index += 1
                         End If

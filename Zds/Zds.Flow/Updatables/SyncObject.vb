@@ -1,9 +1,26 @@
-﻿Namespace Updatables
+﻿Imports Zds.Flow.Collections
+Namespace Updatables
     <DebuggerStepThrough>
     Public Class SyncObject
         Inherits Updatable
         Implements ISyncObject
-        Public Event SyncUpdateEvent(Sender As SyncObject)
+        Private _SyncUpdateEvent As SafeList(Of SyncObjectEventDelegate)
+        Public Custom Event SyncUpdateEvent As SyncObjectEventDelegate
+            AddHandler(value As SyncObjectEventDelegate)
+                If _SyncUpdateEvent Is Nothing Then _SyncUpdateEvent = New SafeList(Of SyncObjectEventDelegate)
+                _SyncUpdateEvent.Add(value)
+            End AddHandler
+            RemoveHandler(value As SyncObjectEventDelegate)
+                If _SyncUpdateEvent IsNot Nothing Then _SyncUpdateEvent.Remove(value)
+            End RemoveHandler
+            RaiseEvent(Sender As ISyncObject)
+                If _SyncUpdateEvent IsNot Nothing Then
+                    For Each [Delegate] In _SyncUpdateEvent.Elements
+                        [Delegate].Invoke(Sender)
+                    Next
+                End If
+            End RaiseEvent
+        End Event
         Private _IsLocked As Boolean
         Protected ReadOnly Property Lock As New Object
         Public ReadOnly Property IsLocked As Boolean Implements ISyncObject.IsLocked
@@ -34,12 +51,13 @@
         Sub New(Updater As Updaters.IUpdater)
             MyBase.New(Updater)
         End Sub
-        Sub New(SyncUpdate As SyncUpdateEventEventHandler)
+        Sub New(SyncUpdate As SyncObjectEventDelegate)
             AddHandler SyncUpdateEvent, SyncUpdate
         End Sub
-        Sub New(Updater As Updaters.IUpdater, SyncUpdate As SyncUpdateEventEventHandler)
+        Sub New(Updater As Updaters.IUpdater, SyncUpdate As SyncObjectEventDelegate)
             MyBase.New(Updater)
             AddHandler SyncUpdateEvent, SyncUpdate
         End Sub
+        Public Delegate Sub SyncObjectEventDelegate(Sender As ISyncObject)
     End Class
 End Namespace

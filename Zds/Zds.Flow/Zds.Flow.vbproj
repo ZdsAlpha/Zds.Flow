@@ -71,8 +71,8 @@
     <Compile Include="DelayHandlers\ConstantSleep.vb" />
     <Compile Include="DelayHandlers\Sleep.vb" />
     <Compile Include="DelayHandlers\Spin.vb" />
-    <Compile Include="ExceptionHandlers\ConsoleLogger.vb" />
-    <Compile Include="ExceptionHandlers\ExceptionHandler.vb" />
+    <Compile Include="ExceptionHandling\ConsoleLogger.vb" />
+    <Compile Include="ExceptionHandling\ExceptionHandler.vb" />
     <Compile Include="Interfaces\Collections\IRound.vb" />
     <Compile Include="Interfaces\Machinery\IMachinery.vb" />
     <Compile Include="Interfaces\Misc\IActivatable.vb" />
@@ -93,8 +93,8 @@
     <Compile Include="Interfaces\DelayHandlers\IDelayHandler.vb" />
     <Compile Include="Interfaces\DelayHandlers\IDelayModifiable.vb" />
     <Compile Include="Interfaces\Misc\IDestroyable.vb" />
-    <Compile Include="Interfaces\Misc\IThrowsException.vb" />
-    <Compile Include="Interfaces\ExceptionHandlers\IExceptionHandler.vb" />
+    <Compile Include="Interfaces\ExceptionHandling\IThrowsException.vb" />
+    <Compile Include="Interfaces\ExceptionHandling\IExceptionHandler.vb" />
     <Compile Include="Interfaces\Misc\IPauseResumable.vb" />
     <Compile Include="Interfaces\Misc\IResetable.vb" />
     <Compile Include="Interfaces\Misc\IStartStopable.vb" />
@@ -107,7 +107,7 @@
     <Compile Include="Machinery\Core\AsyncConverter.vb" />
     <Compile Include="Machinery\Core\AsyncSink.vb" />
     <Compile Include="Machinery\Core\AsyncSource.vb" />
-    <Compile Include="Machinery\Core\Machinery.vb" />
+    <Compile Include="Machinery\Core\Machine.vb" />
     <Compile Include="Machinery\Core\Converter.vb" />
     <Compile Include="Machinery\Core\Sink.vb" />
     <Compile Include="Machinery\Core\Source.vb" />

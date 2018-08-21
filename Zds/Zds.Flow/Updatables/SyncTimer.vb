@@ -1,10 +1,27 @@
-﻿Namespace Updatables
+﻿Imports Zds.Flow.Collections
+Namespace Updatables
     <DebuggerStepThrough>
     Public Class SyncTimer
         Inherits SyncObject
         Implements ISyncTimer
-        Public Event TickEvent(Sender As SyncTimer, ByRef Time As TimeSpan)
+        Private _TickEvent As SafeList(Of SyncTimerEventDelegate)
         Private _LastError As Long
+        Public Custom Event TickEvent As SyncTimerEventDelegate
+            AddHandler(value As SyncTimerEventDelegate)
+                If _TickEvent Is Nothing Then _TickEvent = New SafeList(Of SyncTimerEventDelegate)
+                _TickEvent.Add(value)
+            End AddHandler
+            RemoveHandler(value As SyncTimerEventDelegate)
+                If _TickEvent IsNot Nothing Then _TickEvent.Remove(value)
+            End RemoveHandler
+            RaiseEvent(Sender As ISyncTimer, ByRef Time As TimeSpan)
+                If _TickEvent IsNot Nothing Then
+                    For Each [Delegate] In _TickEvent.Elements
+                        [Delegate].Invoke(Sender, Time)
+                    Next
+                End If
+            End RaiseEvent
+        End Event
         Public Property LastTick As TimeSpan Implements ISyncTimer.LastTick
         Public Property Delay As TimeSpan = TimeSpan.FromSeconds(1) Implements ISyncTimer.Delay
         Public Property IsTolerant As Boolean Implements ISyncTimer.IsTolerant
@@ -66,12 +83,14 @@
         Sub New(Updater As Updaters.IUpdater)
             MyBase.New(Updater)
         End Sub
-        Sub New(Tick As TickEventEventHandler)
+        Sub New(Tick As SyncTimerEventDelegate)
             AddHandler TickEvent, Tick
         End Sub
-        Sub New(Updater As Updaters.IUpdater, Tick As TickEventEventHandler)
+        Sub New(Updater As Updaters.IUpdater, Tick As SyncTimerEventDelegate)
             MyBase.New(Updater)
             AddHandler TickEvent, Tick
         End Sub
+
+        Public Delegate Sub SyncTimerEventDelegate(Sender As ISyncTimer, ByRef Time As TimeSpan)
     End Class
 End Namespace

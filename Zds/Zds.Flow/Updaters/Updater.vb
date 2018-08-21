@@ -4,12 +4,28 @@ Namespace Updaters
     <DebuggerStepThrough>
     Public Class Updater
         Implements IUpdater
+        Private _OnException As SafeList(Of ExceptionHandling.IThrowsException.OnExceptionDelegate)
         Private _IsDestroyed As Boolean = False
         Private _IsRunning As Boolean = False
         Private _IsPaused As Boolean = False
         Private _Targets As New SafeList(Of Updatables.IUpdatable)
         Public Property DelayHandler As DelayHandlers.IDelayHandler Implements IUpdater.DelayHandler
-        Public Property ExceptionHandler As ExceptionHandlers.IExceptionHandler Implements IUpdater.ExceptionHandler
+        Public Custom Event OnException As ExceptionHandling.IThrowsException.OnExceptionDelegate Implements ExceptionHandling.IThrowsException.OnException
+            AddHandler(value As ExceptionHandling.IThrowsException.OnExceptionDelegate)
+                If _OnException Is Nothing Then _OnException = New SafeList(Of ExceptionHandling.IThrowsException.OnExceptionDelegate)
+                _OnException.Add(value)
+            End AddHandler
+            RemoveHandler(value As ExceptionHandling.IThrowsException.OnExceptionDelegate)
+                If _OnException IsNot Nothing Then _OnException.Remove(value)
+            End RemoveHandler
+            RaiseEvent(Sender As Object, Exception As Exception)
+                If _OnException IsNot Nothing Then
+                    For Each [Delegate] In _OnException.Elements
+                        [Delegate].Invoke(Sender, Exception)
+                    Next
+                End If
+            End RaiseEvent
+        End Event
         Public ReadOnly Property Targets As Updatables.IUpdatable() Implements IUpdater.Targets
             Get
                 Return _Targets.Elements
@@ -41,8 +57,11 @@ Namespace Updaters
             Next
         End Sub
         Protected Sub Handle(ex As Exception)
-            If ExceptionHandler IsNot Nothing Then ExceptionHandler.Catch(Me, ex)
+            [Throw](Me, ex)
             If ex.GetType Is GetType(Threading.ThreadAbortException) Then Threading.Thread.ResetAbort()
+        End Sub
+        Private Sub [Throw](Sender As Object, Exception As Exception) Implements ExceptionHandling.IThrowsException.Throw
+            RaiseEvent OnException(Sender, Exception)
         End Sub
         Public Overridable Sub Add(Updatable As Updatables.IUpdatable) Implements IUpdater.Add
             'Security checks

@@ -3,13 +3,13 @@ Imports Zds.Flow.Interfaces
 
 Namespace Machinery.Core
     Public MustInherit Class Converter(Of Input, Output)
-        Inherits Machinery
+        Inherits Machine
         Implements IConverter(Of Input, Output)
         Public Property Sink As ISink(Of Output) Implements ISource(Of Output).Sink
         Public Property Convert As ConvertDelegate
         Public Property Queue As IQueue(Of Input)
         Public Property Dropping As Boolean = False
-        Public Property Recursive As Boolean = True
+        Public Property Recursive As Boolean = False
         Public Property MustConvert As Boolean = False
         Public Function Receive(obj As Input) As Boolean Implements ISink(Of Input).Receive
             Dim _Queue = Queue
