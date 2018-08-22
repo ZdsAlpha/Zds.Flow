@@ -1,4 +1,4 @@
-﻿Namespace DelayHandlers
+﻿Namespace DelayHandling
     <DebuggerStepThrough>
     Public Class ConstantSleep
         Implements IDelayHandler

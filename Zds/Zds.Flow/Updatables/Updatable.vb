@@ -174,7 +174,7 @@ Namespace Updatables
                 RaiseEvent OnStoppedEvent(Me)
             End If
         End Sub
-        Public Sub Update() Implements IUpdatable.Update, Interfaces.IActivatable.Activate
+        Private Sub Update() Implements IUpdatable.Update, Interfaces.IActivatable.Activate
             If IsDestroyed Then Exit Sub
             If IsRunning Then
                 Try

@@ -1,39 +1,33 @@
-﻿#Const SpinWaitSupported = True
-#If SpinWaitSupported Then
-Namespace DelayHandlers
+﻿Namespace DelayHandling
     <DebuggerStepThrough>
-    Public Class Spin
+    Public Class Sleep
         Implements IDelayHandler, IDelayModifiable
-        Private SpinWait As New Threading.SpinWait
-        Public Property Spins As UInteger = 1
+        Public Property Time As UInteger = 1
         Public ReadOnly Property CanDecrease As Boolean Implements IDelayModifiable.CanDecrease
             Get
-                If Spins <= 1 Then Return False
+                If _Time <= 1 Then Return False
                 Return True
             End Get
         End Property
         Public ReadOnly Property CanIncrease As Boolean Implements IDelayModifiable.CanIncrease
             Get
-                If Spins >= UInteger.MaxValue Then Return False
+                If _Time = UInteger.MaxValue Then Return False
                 Return True
             End Get
         End Property
         Public Sub Decrease() Implements IDelayModifiable.Decrease
-            If CanDecrease Then _Spins -= 1
+            If CanDecrease Then _Time -= 1
         End Sub
         Public Sub Increase() Implements IDelayModifiable.Increase
-            If CanIncrease Then _Spins += 1
+            If CanIncrease Then _Time += 1
         End Sub
         Public Sub Delay() Implements IDelayHandler.Delay
-            For i As UInteger = 1 To Spins
-                SpinWait.SpinOnce()
-            Next
+            System.Threading.Thread.Sleep(_Time)
         End Sub
         Sub New()
         End Sub
-        Sub New(Spins As UInteger)
-            Me.Spins = Spins
+        Sub New(Time As UInteger)
+            _Time = Time
         End Sub
     End Class
 End Namespace
-#End If

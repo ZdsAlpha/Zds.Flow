@@ -9,7 +9,7 @@ Namespace Updaters
         Private _IsRunning As Boolean = False
         Private _IsPaused As Boolean = False
         Private _Targets As New SafeList(Of Updatables.IUpdatable)
-        Public Property DelayHandler As DelayHandlers.IDelayHandler Implements IUpdater.DelayHandler
+        Public Property DelayHandler As DelayHandling.IDelayHandler Implements IUpdater.DelayHandler
         Public Custom Event OnException As ExceptionHandling.IThrowsException.OnExceptionDelegate Implements ExceptionHandling.IThrowsException.OnException
             AddHandler(value As ExceptionHandling.IThrowsException.OnExceptionDelegate)
                 If _OnException Is Nothing Then _OnException = New SafeList(Of ExceptionHandling.IThrowsException.OnExceptionDelegate)
@@ -134,7 +134,7 @@ Namespace Updaters
         End Sub
         Sub New()
             Register(Me)
-            DelayHandler = DelayHandlers.ConstantSleep.UniversalDelayHandler
+            DelayHandler = DelayHandling.ConstantSleep.UniversalDelayHandler
         End Sub
 
         Private Shared _Updaters As New SafeList(Of IUpdater)

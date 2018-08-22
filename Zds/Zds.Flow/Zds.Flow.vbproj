@@ -68,9 +68,9 @@
     <Compile Include="Collections\Rounds\Round.vb" />
     <Compile Include="Collections\Rounds\SafeRound.vb" />
     <Compile Include="Collections\Lists\SafeList.vb" />
-    <Compile Include="DelayHandlers\ConstantSleep.vb" />
-    <Compile Include="DelayHandlers\Sleep.vb" />
-    <Compile Include="DelayHandlers\Spin.vb" />
+    <Compile Include="DelayHandling\ConstantSleep.vb" />
+    <Compile Include="DelayHandling\Sleep.vb" />
+    <Compile Include="DelayHandling\Spin.vb" />
     <Compile Include="ExceptionHandling\ConsoleLogger.vb" />
     <Compile Include="ExceptionHandling\ExceptionHandler.vb" />
     <Compile Include="Interfaces\Collections\IRound.vb" />
@@ -90,8 +90,8 @@
     <Compile Include="Interfaces\Collections\IStream.vb" />
     <Compile Include="Interfaces\Updatables\ISystem.vb" />
     <Compile Include="Interfaces\Updatables\ICorrectableTimer.vb" />
-    <Compile Include="Interfaces\DelayHandlers\IDelayHandler.vb" />
-    <Compile Include="Interfaces\DelayHandlers\IDelayModifiable.vb" />
+    <Compile Include="Interfaces\DelayHandling\IDelayHandler.vb" />
+    <Compile Include="Interfaces\DelayHandling\IDelayModifiable.vb" />
     <Compile Include="Interfaces\Misc\IDestroyable.vb" />
     <Compile Include="Interfaces\ExceptionHandling\IThrowsException.vb" />
     <Compile Include="Interfaces\ExceptionHandling\IExceptionHandler.vb" />

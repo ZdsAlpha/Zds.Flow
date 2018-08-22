@@ -8,7 +8,7 @@ Namespace Updatables
         Implements IUpdater
         Private _IsPaused As Boolean = False
         Private _Targets As New SafeList(Of Updatable)
-        Protected Property DelayHandler As DelayHandlers.IDelayHandler Implements IUpdater.DelayHandler
+        Protected Property DelayHandler As DelayHandling.IDelayHandler Implements IUpdater.DelayHandler
         Public ReadOnly Property IsPaused As Boolean Implements IUpdater.IsPaused
             Get
                 Return _IsPaused

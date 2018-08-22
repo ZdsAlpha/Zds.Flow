@@ -7,11 +7,11 @@
                 Return MyBase.Targets
             End Get
         End Property
-        Public Overloads Property DelayHandler As DelayHandlers.IDelayHandler
+        Public Overloads Property DelayHandler As DelayHandling.IDelayHandler
             Get
                 Return MyBase.DelayHandler
             End Get
-            Set(value As DelayHandlers.IDelayHandler)
+            Set(value As DelayHandling.IDelayHandler)
                 MyBase.DelayHandler = value
             End Set
         End Property

@@ -24,13 +24,13 @@ Namespace Updatables
             End RaiseEvent
         End Event
         Public ReadOnly Property ActiveThreads As Integer
-        Public Property MaxThreads As Integer = -1
+        Public Property MaxThreads As Integer = Integer.MaxValue
         Protected Overrides Sub OnUpdated()
             MyBase.OnUpdated()
-            If _MaxThreads = -1 OrElse _ActiveThreads <= _MaxThreads Then
+            If _ActiveThreads <= _MaxThreads Then
                 Interlocked.Increment(_ActiveThreads)
                 Try
-                    If _MaxThreads = -1 OrElse _ActiveThreads <= _MaxThreads Then AsyncUpdate()
+                    If _ActiveThreads <= _MaxThreads Then AsyncUpdate()
                 Catch ex As Exception
                     Handle(ex)
                 End Try
