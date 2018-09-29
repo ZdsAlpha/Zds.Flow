@@ -19,13 +19,19 @@ Namespace Machinery.Core
                         HasConverted = True
                     ElseIf MustConvert Then
                         Exit Do
+                    Else
+                        ConversionFailed(Value)
                     End If
                     HasValue = False
                     Value = Nothing
                 End If
                 'Sinking converted value
                 If HasConverted Then
-                    If (_Sink IsNot Nothing AndAlso _Sink.Receive(Converted)) OrElse Dropping Then
+                    If _Sink IsNot Nothing AndAlso _Sink.Receive(Converted) Then
+                        HasConverted = False
+                        Converted = Nothing
+                    ElseIf Dropping Then
+                        OnDropped(Converted)
                         HasConverted = False
                         Converted = Nothing
                     Else

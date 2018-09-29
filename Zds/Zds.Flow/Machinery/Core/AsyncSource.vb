@@ -12,7 +12,9 @@ Namespace Machinery.Core
             If OutputsCache.Length <= OutputsCache.AverageSize Then HasValue = Generate(Value)
             If Not HasValue Then HasValue = OutputsCache.Dequeue(Value)
             If HasValue Then
-                If (_Sink IsNot Nothing AndAlso _Sink.Receive(Value)) OrElse Dropping Then
+                If _Sink IsNot Nothing AndAlso _Sink.Receive(Value) Then
+                ElseIf Dropping Then
+                    OnDropped(Value)
                 Else
                     OutputsCache.Enqueue(Value)
                 End If

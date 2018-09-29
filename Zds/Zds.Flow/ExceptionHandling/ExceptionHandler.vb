@@ -4,7 +4,6 @@ Namespace ExceptionHandling
     Public Class ExceptionHandler
         Implements IExceptionHandler, IThrowsException
         Private _OnException As SafeList(Of IThrowsException.OnExceptionDelegate)
-        Private ReadOnly _Objects As New SafeList(Of IThrowsException)
         Public Custom Event OnException As IThrowsException.OnExceptionDelegate Implements IThrowsException.OnException
             AddHandler(value As IThrowsException.OnExceptionDelegate)
                 If _OnException Is Nothing Then _OnException = New SafeList(Of IThrowsException.OnExceptionDelegate)
@@ -21,17 +20,10 @@ Namespace ExceptionHandling
                 End If
             End RaiseEvent
         End Event
-        Public ReadOnly Property Objects As IThrowsException()
-            Get
-                Return _Objects.Elements
-            End Get
-        End Property
         Public Overridable Sub Add(Obj As IThrowsException) Implements IExceptionHandler.Add
-            _Objects.Add(Obj)
             AddHandler Obj.OnException, AddressOf Handle
         End Sub
         Public Overridable Sub Remove(Obj As IThrowsException) Implements IExceptionHandler.Remove
-            _Objects.Remove(Obj)
             RemoveHandler Obj.OnException, AddressOf Handle
         End Sub
         Public Overridable Sub Handle(Sender As Object, Exception As Exception) Implements IExceptionHandler.Handle, IThrowsException.Throw

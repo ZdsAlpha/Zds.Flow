@@ -10,6 +10,15 @@ Imports Zds.Flow.Machinery.Objects
 Imports Zds.Flow.Updatables
 Public Module Main
     Public Sub Main()
+        Dim stopwatch As New Stopwatch.Stopwatch
+        stopwatch.Start()
+        For Each prime In PrimeNumbers(100000)
+        Next
+        stopwatch.Stop()
+        Console.WriteLine(stopwatch.Elapsed)
+        Console.ReadKey()
+    End Sub
+    Public Sub __Main()
         Dim LastNumber As BigInteger? = Nothing
         For Each x In Custom(Integer.MaxValue)
             If LastNumber.HasValue Then
@@ -40,7 +49,7 @@ Public Module Main
         Dim Primes As New Int32List
         For i = 2 To Integer.MaxValue
             Dim IsPrime As Boolean = True
-            For j = 2 To i - 1
+            For j = 2 To Math.Ceiling(Math.Sqrt(i - 1))
                 If i Mod j = 0 Then
                     IsPrime = False
                     Exit For

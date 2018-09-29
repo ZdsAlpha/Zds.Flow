@@ -2,6 +2,7 @@
     <DebuggerStepThrough>
     Public Class ConsoleLogger
         Inherits ExceptionHandler
+        Public Property IncludeDetails As Boolean = True
         Public Overrides Sub Handle(Sender As Object, Exception As Exception)
             MyBase.Handle(Sender, Exception)
             Console.WriteLine("Exception occured in " + Sender.GetType.ToString + ": " + Sender.GetHashCode.ToString)

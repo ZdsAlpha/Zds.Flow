@@ -27,10 +27,15 @@ Namespace Machinery.Core
                         Worked = True
                     ElseIf MustConvert Then
                         InputsCache.Enqueue(Value)
+                    Else
+                        ConversionFailed(Value)
                     End If
                 End If
                 If HasConverted Then
-                    If (_Sink IsNot Nothing AndAlso _Sink.Receive(Converted)) OrElse Dropping Then
+                    If _Sink IsNot Nothing AndAlso _Sink.Receive(Converted) Then
+                        Worked = True
+                    ElseIf Dropping Then
+                        OnDropped(Converted)
                         Worked = True
                     Else
                         OutputsCache.Enqueue(Converted)

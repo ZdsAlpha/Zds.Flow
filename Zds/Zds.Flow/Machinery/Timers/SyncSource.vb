@@ -5,6 +5,17 @@ Namespace Machinery.Timers
         Inherits SyncTimer
         Implements ISource(Of Output)
         Private _Source As Core.SyncSource(Of Output)
+        Public Custom Event OnDropped As Core.Source(Of Output).OnDroppedEventDelegate
+            AddHandler(value As Core.Source(Of Output).OnDroppedEventDelegate)
+                AddHandler _Source.OnDroppedEvent, value
+            End AddHandler
+            RemoveHandler(value As Core.Source(Of Output).OnDroppedEventDelegate)
+                RemoveHandler _Source.OnDroppedEvent, value
+            End RemoveHandler
+            RaiseEvent(obj As Output)
+                Throw New NotImplementedException()
+            End RaiseEvent
+        End Event
         Public Property GenerateDelegate As Core.Source(Of Output).GenerateDelegate
         Public Property Dropping As Boolean
             Get

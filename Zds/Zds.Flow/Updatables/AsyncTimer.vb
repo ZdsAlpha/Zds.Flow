@@ -4,7 +4,7 @@ Namespace Updatables
     Public Class AsyncTimer
         Inherits AsyncObject
         Implements IAsyncTimer
-        Public _TickEvent As SafeList(Of AsyncTimerEventDelegate)
+        Private _TickEvent As SafeList(Of AsyncTimerEventDelegate)
         Private _LastError As Long
         Private _IsLocked As Boolean
         Public Custom Event TickEvent As AsyncTimerEventDelegate

@@ -5,6 +5,40 @@ Namespace Machinery.Core
     Public MustInherit Class Converter(Of Input, Output)
         Inherits Machine
         Implements IConverter(Of Input, Output)
+        Private _ConversionFailedEvent As SafeList(Of ConversionFailedEventDelegate)
+        Private _OnDroppedEvent As SafeList(Of OnDroppedEventDelegate)
+        Public Custom Event ConversionFailedEvent As ConversionFailedEventDelegate
+            AddHandler(value As ConversionFailedEventDelegate)
+                If _ConversionFailedEvent Is Nothing Then _ConversionFailedEvent = New SafeList(Of ConversionFailedEventDelegate)
+                _ConversionFailedEvent.Add(value)
+            End AddHandler
+            RemoveHandler(value As ConversionFailedEventDelegate)
+                If _ConversionFailedEvent IsNot Nothing Then _ConversionFailedEvent.Remove(value)
+            End RemoveHandler
+            RaiseEvent(obj As Input)
+                If _ConversionFailedEvent IsNot Nothing Then
+                    For Each [Delegate] In _ConversionFailedEvent.Elements
+                        [Delegate].Invoke(obj)
+                    Next
+                End If
+            End RaiseEvent
+        End Event
+        Public Custom Event OnDroppedEvent As OnDroppedEventDelegate
+            AddHandler(value As OnDroppedEventDelegate)
+                If _OnDroppedEvent Is Nothing Then _OnDroppedEvent = New SafeList(Of OnDroppedEventDelegate)
+                _OnDroppedEvent.Add(value)
+            End AddHandler
+            RemoveHandler(value As OnDroppedEventDelegate)
+                If _OnDroppedEvent IsNot Nothing Then _OnDroppedEvent.Remove(value)
+            End RemoveHandler
+            RaiseEvent(obj As Output)
+                If _OnDroppedEvent IsNot Nothing Then
+                    For Each [Delegate] In _OnDroppedEvent.Elements
+                        [Delegate].Invoke(obj)
+                    Next
+                End If
+            End RaiseEvent
+        End Event
         Public Property Sink As ISink(Of Output) Implements ISource(Of Output).Sink
         Public Property Convert As ConvertDelegate
         Public Property Queue As IQueue(Of Input)
@@ -16,6 +50,12 @@ Namespace Machinery.Core
             If IsDestroyed OrElse _Queue Is Nothing Then Return False
             Return _Queue.Enqueue(obj)
         End Function
+        Protected Sub ConversionFailed(obj As Input)
+            RaiseEvent ConversionFailedEvent(obj)
+        End Sub
+        Protected Sub OnDropped(obj As Output)
+            RaiseEvent OnDroppedEvent(obj)
+        End Sub
         Public Overrides Sub Destroy()
             If IsDestroyed Then Exit Sub
             MyBase.Destroy()
@@ -40,5 +80,7 @@ Namespace Machinery.Core
         End Sub
 
         Public Delegate Function ConvertDelegate(Input As Input, ByRef Output As Output) As Boolean
+        Public Delegate Sub ConversionFailedEventDelegate(obj As Input)
+        Public Delegate Sub OnDroppedEventDelegate(obj As Output)
     End Class
 End Namespace

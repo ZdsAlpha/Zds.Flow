@@ -5,6 +5,28 @@ Namespace Machinery.Timers
         Inherits AsyncTimer
         Implements IConverter(Of Input, Output)
         Private _Converter As Core.AsyncConverter(Of Input, Output)
+        Public Custom Event ConversionFailedEvent As Core.Converter(Of Input, Output).ConversionFailedEventDelegate
+            AddHandler(value As Core.Converter(Of Input, Output).ConversionFailedEventDelegate)
+                AddHandler _Converter.ConversionFailedEvent, value
+            End AddHandler
+            RemoveHandler(value As Core.Converter(Of Input, Output).ConversionFailedEventDelegate)
+                RemoveHandler _Converter.ConversionFailedEvent, value
+            End RemoveHandler
+            RaiseEvent(obj As Input)
+                Throw New NotImplementedException()
+            End RaiseEvent
+        End Event
+        Public Custom Event OnDropped As Core.Converter(Of Input, Output).OnDroppedEventDelegate
+            AddHandler(value As Core.Converter(Of Input, Output).OnDroppedEventDelegate)
+                AddHandler _Converter.OnDroppedEvent, value
+            End AddHandler
+            RemoveHandler(value As Core.Converter(Of Input, Output).OnDroppedEventDelegate)
+                RemoveHandler _Converter.OnDroppedEvent, value
+            End RemoveHandler
+            RaiseEvent(obj As Output)
+                Throw New NotImplementedException()
+            End RaiseEvent
+        End Event
         Public Property ConvertDelegate As Core.Converter(Of Input, Output).ConvertDelegate
         Public Property Dropping As Boolean
             Get
