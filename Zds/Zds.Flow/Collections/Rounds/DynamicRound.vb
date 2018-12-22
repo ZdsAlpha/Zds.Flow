@@ -90,7 +90,7 @@
         End Function
         Public Overrides Function RemoveFirst(ByRef Element As T) As Boolean
             Dim output = MyBase.RemoveFirst(Element)
-            If output Then EnsureLength(Length - 1)
+            If output Then EnsureLength(Length)
             Return output
         End Function
         Public Overrides Function RemoveLast(ByRef Element As T) As Boolean
@@ -100,7 +100,7 @@
         End Function
         Public Overrides Function RemoveFirst(Destination() As T, Start As Integer, Length As Integer) As Integer
             Dim output = MyBase.RemoveFirst(Destination, Start, Length)
-            EnsureLength(Length - output)
+            EnsureLength(Length)
             Return output
         End Function
         Public Overrides Function RemoveLast(Destination() As T, Start As Integer, Length As Integer) As Integer
