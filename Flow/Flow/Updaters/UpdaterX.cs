@@ -12,19 +12,33 @@ namespace Flow.Updaters
         private SafeList<Thread> threads = new SafeList<Thread>();
         private int totalThreads = 0;
         private int idleThreads = 0;
+        private bool isBackground = true;
         public override event ThreadEventDelegate ThreadCreated;
         public override event ThreadEventDelegate ThreadDestroyed;
         public int TotalThreads { get => totalThreads; }
         public int IdleThreads { get => idleThreads; }
         public int SleepTime { get; set; } = 1;
-        public int MaxThreads { get; set; } = 50;
+        public int MaxThreads { get; set; } = 32;
         public int MaxIdleThreads { get; set; } = 10;
-        public TimeSpan MinThreadLifeSpan { get; set; } = TimeSpan.FromSeconds(10);
+        public TimeSpan MinThreadLifeSpan { get; set; } = TimeSpan.FromMinutes(1);
+        public bool IsBackground
+        {
+            get => isBackground;
+            set {
+                isBackground = value;
+                lock (threads.Lock)
+                {
+                    foreach (var thread in threads.Elements)
+                        thread.IsBackground = value;
+                }
+            }
+        }
         
         public void CreateThread()
         {
             if (!IsRunning || Targets.Length == 0) return;
             var thread = new Thread(Work);
+            thread.IsBackground = IsBackground;
             thread.Start();
         }
         private void Work()
@@ -32,6 +46,7 @@ namespace Flow.Updaters
             if (!IsRunning || Targets.Length == 0) return;
             var thread = Thread.CurrentThread;
             threads.Add(thread);
+            thread.IsBackground = IsBackground;
             var _totalThreads = Interlocked.Increment(ref totalThreads);
             if (_totalThreads > MaxThreads)
             {

@@ -81,11 +81,15 @@ namespace Flow.Updatables
 
         public override void Dispose()
         {
+            IUpdatable[] targets;
             lock (actionLock)
             {
+                targets = this.targets.Elements;
                 Clear();
                 base.Dispose();
             }
+            foreach (var target in targets)
+                target.Dispose();
         }
 
         void IUpdater.Add(IUpdatable obj) => Add(obj);

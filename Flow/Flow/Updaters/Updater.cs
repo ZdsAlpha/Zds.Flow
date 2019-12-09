@@ -12,6 +12,7 @@ namespace Flow.Updaters
     {
         private readonly SafeList<IUpdatable> targets = new SafeList<IUpdatable>();
         protected readonly object actionLock = new object();
+        public bool IsDisposed { get; private set; } = false;
         public bool IsRunning { get; private set; } = false;
         public IUpdatable[] Targets => targets.Elements;
         public event OnExceptionDelegate OnException;
@@ -20,7 +21,7 @@ namespace Flow.Updaters
 
         public virtual void Add(IUpdatable obj)
         {
-            if (obj == null) return;
+            if (IsDisposed || obj == null) return;
             if (obj.IsDisposed) return;
             lock (actionLock)
             {
@@ -30,7 +31,7 @@ namespace Flow.Updaters
         }
         public virtual void Remove(IUpdatable obj)
         {
-            if (obj == null) return;
+            if (IsDisposed || obj == null) return;
             lock (actionLock)
             {
                 targets.Remove(obj);
@@ -39,6 +40,7 @@ namespace Flow.Updaters
         }
         public virtual void Clear()
         {
+            if (IsDisposed) return;
             lock (actionLock)
             {
                 var cache = targets.Elements;
@@ -49,6 +51,7 @@ namespace Flow.Updaters
         }
         public virtual bool Contains(IUpdatable obj)
         {
+            if (IsDisposed) return false;
             lock (actionLock)
                 return targets.Contains(obj);
         }
@@ -56,7 +59,7 @@ namespace Flow.Updaters
         {
             foreach (var target in targets.Elements)
             {
-                if (!IsRunning) break;
+                if (IsDisposed || !IsRunning) break;
                 try
                 {
                     target.Update();
@@ -67,8 +70,16 @@ namespace Flow.Updaters
                 }
             }
         }
-        public virtual void Start() => IsRunning = true;
-        public virtual void Stop() => IsRunning = false;
+        public virtual void Start()
+        {
+            lock (actionLock)
+                if (!IsDisposed) IsRunning = true;
+        }
+        public virtual void Stop()
+        {
+            lock (actionLock)
+                IsRunning = false;
+        }
 
         protected virtual void Handle(Exception ex)
         {
@@ -76,6 +87,19 @@ namespace Flow.Updaters
             if (ex.GetType() == typeof(ThreadAbortException)) Thread.ResetAbort();
         }
         void IThrowsException.Throw(object sender, Exception ex) => OnException?.Invoke(sender, ex);
+        public virtual void Dispose()
+        {
+            IUpdatable[] targets;
+            lock (actionLock)
+            {
+                targets = this.targets.Elements;
+                Reset();
+                this.targets.Clear();
+                IsDisposed = true;
+            }
+            foreach (var target in targets)
+                target.Dispose();
+        }
 
         public abstract void Reset();
         public abstract bool Wait(TimeSpan timeout);
@@ -88,8 +112,9 @@ namespace Flow.Updaters
         static Updater() => DefaultUpdater.Start();
     }
 
-    public interface IUpdater : IStartStopable, IThrowsException
+    public interface IUpdater : IStartStopable, IThrowsException, IDisposable
     {
+        bool IsDisposed { get; }
         IUpdatable[] Targets { get; }
         void Add(IUpdatable obj);
         void Remove(IUpdatable obj);

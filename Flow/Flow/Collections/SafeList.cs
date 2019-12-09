@@ -22,6 +22,7 @@ namespace Flow.Collections
                 }
             }
         }
+        public object Lock => list;
         public int Count => cache.Length;
         public bool IsReadOnly => false;
         public void Add(T item)
