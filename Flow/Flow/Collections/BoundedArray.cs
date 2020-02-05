@@ -119,7 +119,7 @@ namespace Flow.Collections
         public bool AddLast(T element)
         {
             if (ExtendLast(1) == 0) return false;
-            buffer[position + length - 1] = element;
+            buffer[Modulo(position + length - 1, buffer.Length)] = element;
             return true;
         }
         public int AddFirst(T[] source, int index, int length)
@@ -152,7 +152,7 @@ namespace Flow.Collections
         public bool RemoveLast(ref T element)
         {
             if (length == 0) return false;
-            element = buffer[position + length - 1];
+            element = buffer[Modulo(position + length - 1, buffer.Length)];
             ShrinkLast(1);
             return true;
         }

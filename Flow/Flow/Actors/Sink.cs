@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 
-namespace Flow.Machinery
+namespace Flow.Actors
 {
     static class Sink<T>
     {
@@ -121,7 +121,9 @@ namespace Flow.Machinery
         }
     }
 
-    public interface IUpdatableSink<T> : IUpdatable, ISink<T>
+    public interface IActor<Message> : ISink<Message> { }
+
+    public interface IUpdatableSink<T> : IUpdatable, ISink<T>, IActor<T>
     {
         int Send(T[] array);
         int Send(T[] array, int index, int length);
@@ -130,5 +132,7 @@ namespace Flow.Machinery
         int Receive(T[] array, int index, int length);
     }
 
-    public delegate void SinkDelegate<T>(IUpdatableSink<T> sender);
+    public delegate void ActorDelegate<T>(IUpdatableSink<T> sender);
+
+    public delegate void SinkDelegate<T>(T obj);
 }
